@@ -1,0 +1,5 @@
+services:
+  front-end:
+    image: client-img
+    ports:
+      - 8080:80
