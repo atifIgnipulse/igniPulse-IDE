@@ -224,5 +224,9 @@ app.post('/switchDB', async (req, res) => {
         res.send(error)
     }
 })
+
+app.get(('/ping', (req, res)=>{
+    res.status(200).send("pong.")
+}))
 const port = process.env.PORT || 9000
 server.listen(port, () => console.log(`Server started at port ${port}`))
