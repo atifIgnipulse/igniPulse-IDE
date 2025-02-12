@@ -229,4 +229,4 @@ app.get(('/ping', (req, res)=>{
     res.status(200).send("pong.")
 }))
 const port = process.env.PORT || 9000
-server.listen(port, () => console.log(`Server started at port ${port}`))
+server.listen(port,'0.0.0.0',() => console.log(`Server started at port ${port}`))
