@@ -202,6 +202,7 @@ function PythonIDE() {
             Run <Play size="18" />
           </button>
           <button
+            id="check"
             className="cursor-pointer text-sm sm:text-base font-semibold flex items-center justify-between gap-x-4 bg-[#f2c627] lg:px-4 md:px-4 px-2 py-2 rounded hover:bg-[#c8a93a] text-zinc-900 tracking-wider"
             onClick={openFile}
           >

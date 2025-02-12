@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8080:5000
+    network_mode: "host"
   backend:
     container_name: backend_container
     build: 
@@ -19,7 +20,6 @@ services:
       - HOST=mysql
       - USER=root
       - PASSWORD=mySql123
-      - DEFAULT_DATABASE=sys
     command: sh -c "sleep 20 && node app.js"
   mysql:
     container_name: mysql-container
