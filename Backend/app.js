@@ -32,7 +32,6 @@ const connection = mysql.createConnection({
 io.on("connection", (socket) => {
     console.log("connection established with user:", socket.id);
 
-
     // listen for messages from client
     socket.on("runPy", async (data) => {
 
@@ -66,11 +65,11 @@ io.on("connection", (socket) => {
                             resolve();
                         });
                     });
-                    await processNextLine(); // Continue processing next lines
+                    await processNextLine(); 
                 } else {
                     final_input_to_python.push(line);
                     currentIndex++;
-                    await processNextLine(); // Continue processing next lines
+                    await processNextLine();
                 }
             } else {
                 // All lines are processed, now execute the Python code
@@ -225,5 +224,6 @@ app.post('/switchDB', async (req, res) => {
 app.get(('/ping', (req, res)=>{
     res.status(200).send("pong.")
 }))
+
 const port = process.env.PORT || 9000
 server.listen(port,'0.0.0.0',() => console.log(`Server started at port ${port}`))
