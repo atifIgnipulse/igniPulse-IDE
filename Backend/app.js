@@ -12,7 +12,7 @@ const server = http.createServer(app);
 // 2. create io for socket
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:5173",
+        origin: "http://51.24.30.180:8080",
         methods: ["GET", "POST"]
     }
 });

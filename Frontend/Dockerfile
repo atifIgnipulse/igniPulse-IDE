@@ -1,17 +1,13 @@
-# build the image
-FROM node:22 AS builder
-
-WORKDIR /app
+FROM node:22-alpine3.20 AS builder
+WORKDIR /client
 COPY package.json package-lock.json ./
 RUN npm install
 COPY . .
 RUN npm run build
 
-# use nginx web server to serve the build app
-FROM nginx:alpine
-# Remove default nginx static files
-RUN rm -rf /usr/share/nginx/html/*
-# Copy built files from builder stage to Nginx directory
-COPY --from=builder /app/dist /usr/share/nginx/html
-EXPOSE 80
-CMD [ "nginx", "-g", "daemon off;" ]
+FROM node:22-alpine3.20
+WORKDIR /client
+RUN npm install -g serve
+COPY --from=builder /client/dist /client/dist
+EXPOSE 5000
+CMD ["serve", "-s", "dist", "-l", "5000"]

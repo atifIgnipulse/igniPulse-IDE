@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:9000";
+const BASE_URL = "http://51.24.30.180:9000";
 
 const ENDPOINTS = {
     post_data : `${BASE_URL}/postData`,
