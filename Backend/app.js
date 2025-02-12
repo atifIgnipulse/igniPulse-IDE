@@ -28,9 +28,6 @@ const connection = mysql.createConnection({
     password: process.env.PASSWORD,
     database: process.env.DEFAULT_DATABASE
 })
-
-
-
 // listen for connection from client
 io.on("connection", (socket) => {
     console.log("connection established with user:", socket.id);
@@ -93,7 +90,7 @@ io.on("connection", (socket) => {
         var result = "";
         let error = "";
 
-        const pyProcess = spawn('python', ['-c', code]);
+        const pyProcess = spawn('python3', ['-c', code]);
         pyProcess.stdout.on('data', (data) => {
             result += data.toString();
             // console.log(result)
