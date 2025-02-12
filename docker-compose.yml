@@ -29,6 +29,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: mySql123
       MYSQL_ROOT_HOST: "%"
+    volumes:
+      - sql_volume:/var/lib/mysql
 
 volumes:
   sql_volume:
