@@ -12,7 +12,7 @@ function PythonIDE() {
   // const textAreaRef = useRef(null);
   const [textArea, setTextArea] = useState("")
   const [saved, setSaved] = useState(false);
-  const [editorContent, setEditorContent] = useState(""); // Editor content state
+  // const [editorContent, setEditorContent] = useState(""); // Editor content state
 
   const handleMouseDown = (e) => {
     e.preventDefault();
@@ -124,7 +124,7 @@ function PythonIDE() {
 
   const handleRun = async () => {
     // const data = textAreaRef.current.view.state.doc.toString();
-    setEditorContent(textArea);
+    // setEditorContent(textArea);
     // Emit the input data to the server using Socket.IO
     socket.current.emit("runPy", textArea);
   };
@@ -149,11 +149,17 @@ function PythonIDE() {
     } else {
       const element = document.createElement("a");
       const file = new Blob(
-        [textAreaRef.current.view.state.doc.toString() || ""],
+        [textArea || ""],
         {
           type: "text/plain",
         }
       );
+      // const file = new Blob(
+      //   [textAreaRef.current.view.state.doc.toString() || ""],
+      //   {
+      //     type: "text/plain",
+      //   }
+      // );
       element.href = URL.createObjectURL(file);
       element.download = `code.py`;
       document.body.appendChild(element);
@@ -177,7 +183,7 @@ function PythonIDE() {
 
     const file = await fileHandle.getFile();
     const fileContent = await file.text();
-    setEditorContent(fileContent);
+    setTextArea(fileContent);
   };
 
   return (
@@ -190,7 +196,7 @@ function PythonIDE() {
         <div className="flex items-center justify-between gap-x-2">
           <button
             className="text-sm sm:text-base font-semibold flex items-center justify-between gap-x-4 bg-[#374151] lg:px-4 md:px-4 px-2 py-2 rounded hover:bg-[#323a47] text-zinc-50 tracking-wider"
-            onClick={() => setEditorContent("")}
+            onClick={() => setTextArea("")}
           >
             Clear <Eraser size="18" />
           </button>
@@ -233,7 +239,7 @@ function PythonIDE() {
             <div className="w-full h-full overflow-hidden">
               <div className="flex items-center justify-center w-full h-full overflow-auto ">
                 <CodeMirror
-                  value={editorContent}
+                  value={textArea}
                   className="w-full h-full border text-[1rem]"
                   extensions={[python()]}
                   // ref={textAreaRef}
