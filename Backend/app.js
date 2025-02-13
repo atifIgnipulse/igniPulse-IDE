@@ -25,8 +25,7 @@ app.use(express.json());
 const connection = mysql.createConnection({
     host: process.env.HOST,
     user: process.env.USER,
-    password: process.env.PASSWORD,
-    database: process.env.DEFAULT_DATABASE
+    password: process.env.PASSWORD
 })
 // listen for connection from client
 io.on("connection", (socket) => {
