@@ -9,7 +9,8 @@ function PythonIDE() {
   const [outputHeight, setOutputHeight] = useState(20);
   const [isDragging, setIsDragging] = useState(false);
   const [mobile, setMobile] = useState(false);
-  const textAreaRef = useRef(null);
+  // const textAreaRef = useRef(null);
+  const [textArea, setTextArea] = useState("")
   const [saved, setSaved] = useState(false);
   const [editorContent, setEditorContent] = useState(""); // Editor content state
 
@@ -122,10 +123,10 @@ function PythonIDE() {
   }, []);
 
   const handleRun = async () => {
-    const data = textAreaRef.current.view.state.doc.toString();
-    setEditorContent(data);
+    // const data = textAreaRef.current.view.state.doc.toString();
+    setEditorContent(textArea);
     // Emit the input data to the server using Socket.IO
-    socket.current.emit("runPy", data);
+    socket.current.emit("runPy", textArea);
   };
 
   const handleDownload = async () => {
@@ -141,7 +142,8 @@ function PythonIDE() {
 
       const writeAbleStream = await fileHandler.createWritable();
       await writeAbleStream.write(
-        textAreaRef.current.view.state.doc.toString()
+        // textAreaRef.current.view.state.doc.toString()
+        textArea
       );
       await writeAbleStream.close();
     } else {
@@ -234,7 +236,8 @@ function PythonIDE() {
                   value={editorContent}
                   className="w-full h-full border text-[1rem]"
                   extensions={[python()]}
-                  ref={textAreaRef}
+                  // ref={textAreaRef}
+                  onChange={(e)=> setTextArea(e.target.value)}
                   options={{
                     lineNumbers: true,
                   }}

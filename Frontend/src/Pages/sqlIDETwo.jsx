@@ -16,7 +16,8 @@ function sqlIDETwo() {
   const [isDragging, setIsDragging] = useState(false);
   const dataRef = useRef(null);
 
-  const textAreaRef = useRef(null);
+  // const textAreaRef = useRef(null);
+  const [textArea, setTextArea] = useState("")
   const [editorContent, setEditorContent] = useState("");
   const [resDB, setResDb] = useState([]);
   const [dataBases, setDataBases] = useState([]);
@@ -86,7 +87,8 @@ function sqlIDETwo() {
 
   const handleRun = () => {
     console.log("first");
-    const data = textAreaRef.current.view?.state?.doc?.toString();
+    // const data = textAreaRef.current.view?.state?.doc?.toString();
+    const data = textArea;
     if (data == "") {
       setEditorContent("");
       return;
@@ -129,13 +131,20 @@ function sqlIDETwo() {
 
       const writeAbleStream = await fileHandler.createWritable();
       await writeAbleStream.write(
-        textAreaRef.current.view.state.doc.toString()
+        // textAreaRef.current.view.state.doc.toString()
+        textArea
       );
       await writeAbleStream.close();
     } else {
       const element = document.createElement("a");
+      // const file = new Blob(
+      //   [textAreaRef.current.view.state.doc.toString() || ""],
+      //   {
+      //     type: "text/plain",
+      //   }
+      // );
       const file = new Blob(
-        [textAreaRef.current.view.state.doc.toString() || ""],
+        [textArea || ""],
         {
           type: "text/plain",
         }
@@ -220,7 +229,8 @@ function sqlIDETwo() {
                   value={editorContent}
                   className="w-full border text-[1rem]"
                   extensions={[sql()]}
-                  ref={textAreaRef}
+                  // ref={textAreaRef}
+                  onChange={(e)=> setTextArea(e.target.value)}
                   options={{
                     lineNumbers: true,
                   }}
