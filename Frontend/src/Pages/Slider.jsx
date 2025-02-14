@@ -47,7 +47,24 @@ const Slider = ({ links }) => {
       </div>
       <div className="lg:hidden md:hidden w-full h-[90%] overflow-hidden relative px-4">
         <div className="absolute right-[50%] top-[45%] z-10 px-2">
-          <div className="swiper-btn-prev"><svg className="text-white" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-arrow-left"><circle cx="12" cy="12" r="10"/><path d="M16 12H8"/><path d="m12 8-4 4 4 4"/></svg></div>
+          <div className="swiper-btn-prev">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="30"
+              height="30"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-circle-arrow-left"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M16 12H8" />
+              <path d="m12 8-4 4 4 4" />
+            </svg>
+          </div>
         </div>
         <Swiper
           className="w-full"
@@ -89,10 +106,27 @@ const Slider = ({ links }) => {
               </motion.div>
             </SwiperSlide>
           ))}
-          
         </Swiper>
         <div className="absolute left-[50%] px-2 top-[45%] z-10 ">
-          <div className="swiper-btn-next"><svg className="text-white" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-arrow-right"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="m12 16 4-4-4-4"/></svg>  </div>
+          <div className="swiper-btn-next">
+            <svg
+              className="text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              width="30"
+              height="30"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-circle-arrow-right"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M8 12h8" />
+              <path d="m12 16 4-4-4-4" />
+            </svg>{" "}
+          </div>
         </div>
       </div>
     </>
