@@ -38,7 +38,7 @@ const Slider = ({ links }) => {
                   to={link.link}
                   className="hover:scale-[1.03] transition-all duration-150 bg-[#ffffff] text-[#000000] text-sm font-bold tracking-wide px-6 py-2 rounded-full"
                 >
-                  Launch IDE
+                  {link.btnText}
                 </Link>
               </div>
             </motion.div>
