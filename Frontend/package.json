@@ -22,6 +22,7 @@
     "react-hot-toast": "^2.5.1",
     "react-router-dom": "^7.1.4",
     "socket.io-client": "^4.8.1",
+    "swiper": "^11.2.3",
     "tailwind-scrollbar": "^4.0.0",
     "tailwindcss": "^4.0.1",
     "vite-plugin-remove-console": "^2.2.0"

@@ -9,7 +9,6 @@ function PythonIDE() {
   const [outputHeight, setOutputHeight] = useState(20);
   const [isDragging, setIsDragging] = useState(false);
   const [mobile, setMobile] = useState(false);
-  const textAreaRef = useRef(null);
   const [saved, setSaved] = useState(false);
   const [editorContent, setEditorContent] = useState(""); // Editor content state
 
@@ -53,6 +52,10 @@ function PythonIDE() {
     }
   };
 
+  const clearOutput = () => {
+    document.getElementById("outputDiv").innerText = "";
+  };
+
   const socket = useRef(null);
 
   useEffect(() => {
@@ -61,15 +64,15 @@ function PythonIDE() {
     socket.current.on("pyResponse", (message) => {
       // Display normal responses
       // console.log(message.replace(/(\r\n|\n)/g, "<br>"))
-      document.getElementById("outputDiv").innerHTML = message.replace(
-        /(\r\n|\n)/g,
-        "<br>"
-      );
+      const res = document.createElement("div");
+      res.innerHTML = message.replace(/(\r\n|\n)/g, "<br>"); 
+      document.getElementById("outputDiv").appendChild(res);
     });
 
     socket.current.on("userInput", (message) => {
       // Get the outputDiv
       const outputDiv = document.getElementById("outputDiv");
+      outputDiv.innerText = "";
 
       // Create a new div for the input prompt
       const inputPromptDiv = document.createElement("div");
@@ -82,7 +85,7 @@ function PythonIDE() {
       const promptLabel = document.createElement("label");
       promptLabel.innerText = message;
       promptLabel.style.marginRight = "10px";
-      promptLabel.style.color = "black";
+      promptLabel.style.color = "white";
 
       // Create the input box
       const inputBox = document.createElement("input");
@@ -91,7 +94,7 @@ function PythonIDE() {
       inputBox.style.padding = "5px";
       inputBox.style.outline = "none";
       inputBox.style.backgroundColor = "inherit";
-      inputBox.style.color = "black";
+      inputBox.style.color = "white";
 
       // Append the label and input box to the inputPromptDiv
       inputPromptDiv.appendChild(promptLabel);
@@ -109,7 +112,7 @@ function PythonIDE() {
           const userInput = inputBox.value.trim();
           if (userInput) {
             socket.current.emit("userEntry", userInput);
-            outputDiv.removeChild(inputPromptDiv); // Remove the prompt field
+            inputBox.disabled = true
           }
         }
       });
@@ -122,10 +125,8 @@ function PythonIDE() {
   }, []);
 
   const handleRun = async () => {
-    const data = textAreaRef.current.view.state.doc.toString();
-    setEditorContent(data);
     // Emit the input data to the server using Socket.IO
-    socket.current.emit("runPy", data);
+    socket.current.emit("runPy", editorContent);
   };
 
   const handleDownload = async () => {
@@ -140,18 +141,13 @@ function PythonIDE() {
       });
 
       const writeAbleStream = await fileHandler.createWritable();
-      await writeAbleStream.write(
-        textAreaRef.current.view.state.doc.toString()
-      );
+      await writeAbleStream.write(editorContent);
       await writeAbleStream.close();
     } else {
       const element = document.createElement("a");
-      const file = new Blob(
-        [textAreaRef.current.view.state.doc.toString() || ""],
-        {
-          type: "text/plain",
-        }
-      );
+      const file = new Blob([editorContent || ""], {
+        type: "text/plain",
+      });
       element.href = URL.createObjectURL(file);
       element.download = `code.py`;
       document.body.appendChild(element);
@@ -161,7 +157,6 @@ function PythonIDE() {
   };
 
   const openFile = async () => {
-    
     const [fileHandle] = await window.showOpenFilePicker({
       types: [
         {
@@ -180,36 +175,37 @@ function PythonIDE() {
 
   return (
     <div
-      className="overflow-hidden w-full h-full flex flex-col items-center justify-center bg-[#ffffff]"
+      className="overflow-hidden w-full h-full flex flex-col items-center justify-center bg-[#101828]"
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
     >
-      <div className="flex items-center justify-between px-8 py-2 w-full">
+      <div className="flex items-center justify-between gap-x-2 lg:px-8 md:px-8 px-1 py-2 w-full">
         <div className="flex items-center justify-between gap-x-2">
           <button
-            className="cursor-pointer text-sm sm:text-base font-semibold flex items-center justify-between gap-x-4 bg-[#374151] lg:px-4 md:px-4 px-2 py-2 rounded hover:bg-[#323a47] text-zinc-50 tracking-wider"
+            className="cursor-pointer text-sm sm:text-base font-semibold flex items-center justify-between gap-x-2 bg-[#374151] lg:px-4 md:px-4 px-2 py-2 rounded hover:bg-[#323a47] text-zinc-50 tracking-wider"
             onClick={() => setEditorContent("")}
           >
             Clear <Eraser size="18" />
           </button>
         </div>
 
-        <div className="flex gap-x-2 px-2">
+        <div className="flex items-center justify-between gap-x-2">
+          
           <button
-            className="cursor-pointer text-sm sm:text-base bg-green-600 font-semibold flex items-center justify-between gap-x-4 lg:px-4 md:px-4 px-2 py-2 rounded hover:bg-green-700 text-zinc-50 tracking-wider"
+            className="cursor-pointer text-sm sm:text-base bg-green-600 font-semibold flex items-center justify-between gap-x-3 lg:px-4 md:px-4 px-2 py-2 rounded hover:bg-green-700 text-zinc-50 tracking-wide"
             onClick={handleRun}
           >
             Run <Play size="18" />
           </button>
           <button
             id="check"
-            className="cursor-pointer text-sm sm:text-base font-semibold flex items-center justify-between gap-x-4 bg-[#f2c627] lg:px-4 md:px-4 px-2 py-2 rounded hover:bg-[#c8a93a] text-zinc-900 tracking-wider"
+            className="cursor-pointer lg:text-sm md:text-sm text-xs sm:text-base font-semibold flex items-center justify-between gap-x-3 bg-[#ba9306] lg:px-4 md:px-4 px-1 py-2 rounded hover:bg-[#c8a93af0] text-zinc-50 tracking-wide"
             onClick={openFile}
           >
-            Open File <File size="18" />
+            Open Script <File size="18" />
           </button>
           <button
-            className="cursor-pointer text-sm sm:text-base font-semibold flex items-center justify-between gap-x-4 bg-[#374151] lg:px-4 md:px-4 px-2 py-2 rounded hover:bg-[#323a47] text-zinc-50 tracking-wider"
+            className="cursor-pointer lg:text-sm md:text-sm text-xs sm:text-base font-semibold flex items-center justify-between gap-x-3 bg-[#374151] lg:px-4 md:px-4 px-2 py-2 rounded hover:bg-[#323a47] text-zinc-50 tracking-wide"
             onClick={handleDownload}
           >
             Save <Save size="18" />
@@ -233,8 +229,9 @@ function PythonIDE() {
                 <CodeMirror
                   value={editorContent}
                   className="w-full h-full border text-[1rem]"
-                  extensions={[python()]}
-                  ref={textAreaRef}
+                  // extensions={[python()]}
+                  theme="dark"
+                  onChange={(newContent) => setEditorContent(newContent)}
                   options={{
                     lineNumbers: true,
                   }}
@@ -248,6 +245,7 @@ function PythonIDE() {
             mobile ? "rotate-90 w-full" : "h-full"
           } lg:cursor-col-resize md:cursor-col-resize cursor-row-resize`}
           onMouseDown={handleMouseDown}
+          onTouchStart={handleMouseDown}
           version="1.1"
           id="Layer_1"
           xmlns="http://www.w3.org/2000/svg"
@@ -257,7 +255,7 @@ function PythonIDE() {
           viewBox="0 0 64 64"
           enableBackground="new 0 0 64 64"
           xmlSpace="preserve"
-          fill="#000000"
+          fill="#ffffff"
         >
           <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
           <g
@@ -269,7 +267,7 @@ function PythonIDE() {
             {" "}
             <line
               fill="none"
-              stroke="#000000"
+              stroke="#ffffff"
               strokeWidth="2"
               strokeMiterlimit="10"
               x1="24"
@@ -279,7 +277,7 @@ function PythonIDE() {
             ></line>{" "}
             <line
               fill="none"
-              stroke="#000000"
+              stroke="#ffffff"
               strokeWidth="2"
               strokeMiterlimit="10"
               x1="32"
@@ -289,7 +287,7 @@ function PythonIDE() {
             ></line>{" "}
             <line
               fill="none"
-              stroke="#000000"
+              stroke="#ffffff"
               strokeWidth="2"
               strokeMiterlimit="10"
               x1="40"
@@ -300,18 +298,25 @@ function PythonIDE() {
           </g>
         </svg>
         <div
-          className="bg-[#FFFFFF] border relative lg:py-4 md:py-2 lg:px-5 md:px-2 px-6 flex flex-col gap-y-4 p-4 text-gray-900"
+          className="bg-transparent border relative lg:py-2 md:py-2 lg:px-3 md:px-2 px-6 flex flex-col items-end gap-y-2 p-4 "
           style={
             mobile
               ? { height: `${outputHeight}%`, width: "100%" }
               : { width: `${outputWidth}%`, height: "100%" }
           }
         >
-          <h2 className="text-lg font-semibold leading-tight tracking-wider select-none">
+          <h2 className="w-full text-2xl text-center font-semibold leading-tight tracking-wider select-none bg-gray-700 text-white py-2">
             Output
+           
           </h2>
+          <button
+            className="w-fit cursor-pointer text-sm sm:text-base bg-red-600 font-semibold flex items-center justify-between gap-x-4 lg:px-4 md:px-4 px-2 py-2 rounded hover:bg-red-700 text-zinc-50 tracking-wider"
+            onClick={clearOutput}
+          >
+            <Eraser size="18" />
+          </button>
           <div
-            className="leading-snug tracking-widest text-zinc-900 text-justify text-[.9rem] overflow-y-auto overflow-x-hidden"
+            className="w-full leading-snug tracking-widest text-white text-justify text-[.9rem] overflow-y-auto overflow-x-hidden ps-2"
             id="outputDiv"
           ></div>
         </div>
