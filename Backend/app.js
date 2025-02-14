@@ -92,7 +92,7 @@ io.on("connection", (socket) => {
         pyProcess.stdout.on('data', (data) => {
             result += data.toString();
             // console.log(result)
-            socket.emit("pyResponse", result); // Send other outputs to the client   
+            // socket.emit("pyResponse", result); // Send other outputs to the client   
 
         })
 

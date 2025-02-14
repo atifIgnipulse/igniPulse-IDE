@@ -66,13 +66,17 @@ function PythonIDE() {
       // console.log(message.replace(/(\r\n|\n)/g, "<br>"))
       const res = document.createElement("div");
       res.innerHTML = message.replace(/(\r\n|\n)/g, "<br>"); 
+      res.style.borderBottom = '2px solid white';
+      res.style.borderBottomStyle = "dashed";
+      res.style.paddingBottom = "6px";
+      res.style.paddingTop = "6px";
       document.getElementById("outputDiv").appendChild(res);
     });
 
     socket.current.on("userInput", (message) => {
       // Get the outputDiv
       const outputDiv = document.getElementById("outputDiv");
-      outputDiv.innerText = "";
+      // outputDiv.innerText = "";
 
       // Create a new div for the input prompt
       const inputPromptDiv = document.createElement("div");
