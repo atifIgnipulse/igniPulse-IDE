@@ -12,7 +12,6 @@ function PythonIDE() {
   const [saved, setSaved] = useState(false);
   const [editorContent, setEditorContent] = useState(""); // Editor content state
 
-
   const handleMouseDown = (e) => {
     e.preventDefault();
     setIsDragging(true);
@@ -28,7 +27,6 @@ function PythonIDE() {
       }
     }
   };
-
   const handleMouseMoveVertical = (e) => {
     if (isDragging) {
       const newHeight =
@@ -53,38 +51,6 @@ function PythonIDE() {
       handleMouseMoveVertical(e);
     }
   };
-
-  const handleTouchMoveHorizontal = (e) => {
-    if (isDragging) {
-      const touch = e.touches[0];
-      const newWidth =
-        ((window.innerWidth - touch.clientX) / window.innerWidth) * 100;
-      if (newWidth > 10 && newWidth < 80) {
-        setOutputWidth(newWidth);
-      }
-    }
-  };
-
-  const handleTouchMoveVertical = (e) => {
-    if (isDragging) {
-      const touch = e.touches[0];
-      const newHeight =
-        ((window.innerHeight - touch.clientY) / window.innerHeight) * 100;
-      if (newHeight > 10 && newHeight < 80) {
-        setOutputHeight(newHeight);
-      }
-    }
-  };
-
-  const handleTouchStart = (e) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleTouchEnd = () => {
-    setIsDragging(false);
-  };
-
 
   const clearOutput = () => {
     document.getElementById("outputDiv").innerText = "";
@@ -279,15 +245,7 @@ function PythonIDE() {
             mobile ? "rotate-90 w-full" : "h-full"
           } lg:cursor-col-resize md:cursor-col-resize cursor-row-resize`}
           onMouseDown={handleMouseDown}
-          onTouchStart={handleTouchStart}
-          onMouseMove={handleMouseMove}
-          onTouchMove={(e) => {
-            if (mobile) {
-              handleTouchMoveVertical(e);
-            } else {
-              handleTouchMoveHorizontal(e);
-            }
-          }}
+          onTouchStart={handleMouseDown}
           version="1.1"
           id="Layer_1"
           xmlns="http://www.w3.org/2000/svg"
