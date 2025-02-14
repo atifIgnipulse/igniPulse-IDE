@@ -7,15 +7,15 @@ import Footer from "./Footer";
 const LandingPage = () => {
   const texts = [
     {
-      name: "Python IDE",
+      name: "Python Playground",
       desc: "A robust Python environment designed for seamless coding, debugging, and deployment. Perfect for AI, data science, and automation projects.",
-      btnText: "Launch IDE",
+      btnText: "Play",
       link: "/python",
     },
     {
-      name: "SQL IDE",
+      name: "SQL Playground",
       desc: "Query, visualize, and manage your databases effortlessly. Our SQL IDE provides powerful tools for handling structured data with precision.",
-      btnText: "Launch IDE",
+      btnText: "Play",
       link: "/sql",
     },
     // {
