@@ -186,7 +186,7 @@ function PythonIDE() {
       <div className="flex items-center justify-between gap-x-2 lg:px-8 md:px-8 px-1 py-2 w-full">
         <div className="flex items-center justify-between gap-x-2">
           <button
-            className="cursor-pointer text-sm sm:text-base font-semibold flex items-center justify-between gap-x-2 bg-[#374151] lg:px-4 md:px-4 px-2 py-2 rounded hover:bg-[#323a47] text-zinc-50 tracking-wider"
+            className="cursor-pointer text-sm sm:text-base font-semibold flex items-center justify-between gap-x-2 bg-red-600 lg:px-4 md:px-4 px-2 py-2 rounded hover:bg-[#323a47] text-zinc-50 tracking-wider"
             onClick={() => setEditorContent("")}
           >
             Clear <Eraser size="18" />
