@@ -59,7 +59,7 @@ function PythonIDE() {
   const socket = useRef(null);
 
   useEffect(() => {
-    socket.current = io("http://51.24.30.180:9000");
+    socket.current = io("http://backend:9000");
 
     socket.current.on("pyResponse", (message) => {
       // Display normal responses
@@ -199,7 +199,7 @@ function PythonIDE() {
             className="cursor-pointer text-sm sm:text-base bg-green-600 font-semibold flex items-center justify-between gap-x-3 lg:px-4 md:px-4 px-2 py-2 rounded hover:bg-green-700 text-zinc-50 tracking-wide"
             onClick={handleRun}
           >
-            Run <Play size="18" />
+            Execute <Play size="18" />
           </button>
           <button
             id="check"
