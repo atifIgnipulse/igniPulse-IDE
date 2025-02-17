@@ -10,7 +10,7 @@ const mysql = require('mysql2')
 // 1. create hppt server for app
 const server = http.createServer(app);
 // 2. create io for socket
-const allowedOrigins = ["http://51.24.30.180:8080", "http://igniup.com:8080"]
+const allowedOrigins = ["http://frontend:8080", "http://igniup.com:8080"]
 const io = new Server(server, {
     cors: {
         origin: (origin, callback)=>{
