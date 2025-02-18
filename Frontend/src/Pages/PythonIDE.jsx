@@ -59,72 +59,76 @@ function PythonIDE() {
   const socket = useRef(null);
 
   useEffect(() => {
-    socket.current = io("http://51.24.30.180:9000");
+    if (!socket.current) {
+      socket.current = io("http://51.24.30.180:9000");
 
-    socket.current.on("pyResponse", (message) => {
-      // Display normal responses
-      // console.log(message.replace(/(\r\n|\n)/g, "<br>"))
-      const res = document.createElement("div");
-      res.innerHTML = message.replace(/(\r\n|\n)/g, "<br>"); 
-      res.style.borderBottom = '2px solid white';
-      res.style.borderBottomStyle = "dashed";
-      res.style.paddingBottom = "6px";
-      res.style.paddingTop = "6px";
-      document.getElementById("outputDiv").appendChild(res);
-    });
-
-    socket.current.on("userInput", (message) => {
-      // Get the outputDiv
-      const outputDiv = document.getElementById("outputDiv");
-      // outputDiv.innerText = "";
-
-      // Create a new div for the input prompt
-      const inputPromptDiv = document.createElement("div");
-      inputPromptDiv.id = "inputPromptDiv";
-      inputPromptDiv.style.marginTop = "10px";
-      inputPromptDiv.style.display = "flex";
-      inputPromptDiv.style.alignItems = "center";
-
-      // Create a label for the prompt message
-      const promptLabel = document.createElement("label");
-      promptLabel.innerText = message;
-      promptLabel.style.marginRight = "10px";
-      promptLabel.style.color = "white";
-
-      // Create the input box
-      const inputBox = document.createElement("input");
-      inputBox.type = "text";
-      inputBox.id = "dynamicInput";
-      inputBox.style.padding = "5px";
-      inputBox.style.outline = "none";
-      inputBox.style.backgroundColor = "inherit";
-      inputBox.style.color = "white";
-
-      // Append the label and input box to the inputPromptDiv
-      inputPromptDiv.appendChild(promptLabel);
-      inputPromptDiv.appendChild(inputBox);
-
-      // Append the inputPromptDiv to the outputDiv
-      outputDiv.appendChild(inputPromptDiv);
-
-      // Focus on the input box
-      inputBox.focus();
-
-      // Add an event listener for the Enter key
-      inputBox.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-          const userInput = inputBox.value.trim();
-          if (userInput) {
-            socket.current.emit("userEntry", userInput);
-            inputBox.disabled = true
-          }
-        }
+      socket.current.on("pyResponse", (message) => {
+        // Display normal responses
+        // console.log(message.replace(/(\r\n|\n)/g, "<br>"))
+        const res = document.createElement("div");
+        res.innerHTML = message.replace(/(\r\n|\n)/g, "<br>");
+        res.style.borderBottom = "2px solid white";
+        res.style.borderBottomStyle = "dashed";
+        res.style.paddingBottom = "6px";
+        res.style.paddingTop = "6px";
+        document.getElementById("outputDiv").appendChild(res);
       });
-    });
+
+      socket.current.on("userInput", (message) => {
+        // Get the outputDiv
+        const outputDiv = document.getElementById("outputDiv");
+        // outputDiv.innerText = "";
+
+        // Create a new div for the input prompt
+        const inputPromptDiv = document.createElement("div");
+        inputPromptDiv.id = "inputPromptDiv";
+        inputPromptDiv.style.marginTop = "10px";
+        inputPromptDiv.style.display = "flex";
+        inputPromptDiv.style.alignItems = "center";
+
+        // Create a label for the prompt message
+        const promptLabel = document.createElement("label");
+        promptLabel.innerText = message;
+        promptLabel.style.marginRight = "10px";
+        promptLabel.style.color = "white";
+
+        // Create the input box
+        const inputBox = document.createElement("input");
+        inputBox.type = "text";
+        inputBox.id = "dynamicInput";
+        inputBox.style.padding = "5px";
+        inputBox.style.outline = "none";
+        inputBox.style.backgroundColor = "inherit";
+        inputBox.style.color = "white";
+
+        // Append the label and input box to the inputPromptDiv
+        inputPromptDiv.appendChild(promptLabel);
+        inputPromptDiv.appendChild(inputBox);
+
+        // Append the inputPromptDiv to the outputDiv
+        outputDiv.appendChild(inputPromptDiv);
+
+        // Focus on the input box
+        inputBox.focus();
+
+        // Add an event listener for the Enter key
+        inputBox.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            const userInput = inputBox.value.trim();
+            if (userInput) {
+              socket.current.emit("userEntry", userInput);
+              inputBox.disabled = true;
+            }
+          }
+        });
+      });
+    }
 
     return () => {
-      // Clean up the WebSocket connection
-      socket.current.disconnect();
+      if (socket.current) {
+        socket.current.disconnect();
+        socket.current = null;
+      }
     };
   }, []);
 
@@ -194,7 +198,6 @@ function PythonIDE() {
         </div>
 
         <div className="flex items-center justify-between gap-x-2">
-          
           <button
             className="cursor-pointer text-sm sm:text-base bg-green-600 font-semibold flex items-center justify-between gap-x-3 lg:px-4 md:px-4 px-2 py-2 rounded hover:bg-green-700 text-zinc-50 tracking-wide"
             onClick={handleRun}
@@ -311,7 +314,6 @@ function PythonIDE() {
         >
           <h2 className="w-full text-2xl text-center font-semibold leading-tight tracking-wider select-none bg-gray-700 text-white py-2">
             Output
-           
           </h2>
           <button
             className="w-fit cursor-pointer text-sm sm:text-base bg-red-600 font-semibold flex items-center justify-between gap-x-4 lg:px-4 md:px-4 px-2 py-2 rounded hover:bg-red-700 text-zinc-50 tracking-wider"
