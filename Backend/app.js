@@ -108,7 +108,6 @@ io.on("connection", (socket) => {
         });
         // Listen for input from the client and forward it to the Python script
 
-
         pyProcess.on('close', (code) => {
             if (code === 0) {
                 socket.emit("pyResponse", result)
