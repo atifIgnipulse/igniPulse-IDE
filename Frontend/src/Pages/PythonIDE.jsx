@@ -59,7 +59,7 @@ function PythonIDE() {
   const socket = useRef(null);
 
   useEffect(() => {
-    socket.current = io("http://backend_container:9000");
+    socket.current = io("http://51.24.30.180:9000");
 
     socket.current.on("pyResponse", (message) => {
       // Display normal responses
