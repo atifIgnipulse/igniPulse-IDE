@@ -60,10 +60,7 @@ function PythonIDE() {
 
   useEffect(() => {
     if (!socket.current) {
-      socket.current = io("http://51.24.30.180:9000", {
-        transports: ["websocket"], // Force WebSocket to avoid polling issues
-        reconnection: true, // Allow reconnection
-      });
+      socket.current = io("http://51.24.30.180:9000");
 
       socket.current.on("pyResponse", (message) => {
         // Display normal responses
