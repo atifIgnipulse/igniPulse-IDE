@@ -9,7 +9,7 @@ function PythonIDE() {
   const [outputHeight, setOutputHeight] = useState(20);
   const [isDragging, setIsDragging] = useState(false);
   const [mobile, setMobile] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [disable, setDisable] = useState(false);
   const [editorContent, setEditorContent] = useState(""); // Editor content state
 
   const handleMouseDown = (e) => {
@@ -63,6 +63,7 @@ function PythonIDE() {
       socket.current = io("http://igniup.com:9000");
 
       socket.current.on("pyResponse", (message) => {
+        setDisable(false);
         // Display normal responses
         // console.log(message.replace(/(\r\n|\n)/g, "<br>"))
         const res = document.createElement("div");
@@ -133,6 +134,7 @@ function PythonIDE() {
   }, []);
 
   const handleRun = async () => {
+    setDisable(true);
     // Emit the input data to the server using Socket.IO
     socket.current.emit("runPy", editorContent);
   };
@@ -202,7 +204,15 @@ function PythonIDE() {
             className="cursor-pointer text-sm sm:text-base bg-green-600 font-semibold flex items-center justify-between gap-x-3 lg:px-4 md:px-4 px-2 py-2 rounded hover:bg-green-700 text-zinc-50 tracking-wide"
             onClick={handleRun}
           >
-            Execute <Play size="18" />
+            {disable ? (
+              <div className="flex justify-center items-center h-full">
+                <div className="w-12 h-12 border-4 border-t-transparent border-blue-500 rounded-full animate-spin"></div>
+              </div>
+            ) : (
+              <>
+                Execute <Play size="18" />
+              </>
+            )}
           </button>
           <button
             id="check"
