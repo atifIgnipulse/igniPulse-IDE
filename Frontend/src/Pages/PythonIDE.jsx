@@ -60,7 +60,7 @@ function PythonIDE() {
 
   useEffect(() => {
     if (!socket.current) {
-      socket.current = io("http://www.igniup.com:9000");
+      socket.current = io("http://igniup.com:9000");
 
       socket.current.on("pyResponse", (message) => {
         // Display normal responses

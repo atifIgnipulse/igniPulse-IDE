@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://www.igniup.com:9000";
+const BASE_URL = "http://igniup.com:9000";
 
 const ENDPOINTS = {
     post_data : `${BASE_URL}/postData`,
