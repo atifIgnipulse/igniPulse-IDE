@@ -134,6 +134,7 @@ function PythonIDE() {
   }, []);
 
   const handleRun = async () => {
+    // console.log("first")
     setDisable(true);
     // Emit the input data to the server using Socket.IO
     socket.current.emit("runPy", editorContent);
@@ -201,17 +202,18 @@ function PythonIDE() {
 
         <div className="flex items-center justify-between gap-x-2">
           <button
-            className="cursor-pointer text-sm sm:text-base bg-green-600 font-semibold flex items-center justify-between gap-x-3 lg:px-4 md:px-4 px-2 py-2 rounded hover:bg-green-700 text-zinc-50 tracking-wide"
+            disabled={disable}
+            className="cursor-pointer text-sm sm:text-base bg-green-600 font-semibold lg:px-2 md:px-4 px-2 py-2 w-24 rounded hover:bg-green-700 text-zinc-50 tracking-wide"
             onClick={handleRun}
           >
             {disable ? (
-              <div className="flex justify-center items-center h-full">
-                <div className="w-12 h-12 border-4 border-t-transparent border-blue-500 rounded-full animate-spin"></div>
+              <div className="w-full flex justify-center items-center size-6 lg:px-4 md:px-4 px-2 py-2">
+                <div className=" border-4 border-t-transparent border-white rounded-full animate-spin"></div>
               </div>
             ) : (
-              <>
-                Execute <Play size="18" />
-              </>
+              <div className="h-full w-full flex items-center justify-between gap-x-1">
+                <>Execute</> <Play  size="14"/>
+              </div>
             )}
           </button>
           <button
