@@ -60,7 +60,11 @@ function PythonIDE() {
 
   useEffect(() => {
     if (!socket.current) {
-      socket.current = io("https://igniup.com/api");
+      socket.current = io("https://igniup.com", {
+        path: "/socket.io/",  
+        transports: ["websocket", "polling"],  
+        withCredentials: true 
+    });
 
       socket.current.on("pyResponse", (message) => {
         setDisable(false);
