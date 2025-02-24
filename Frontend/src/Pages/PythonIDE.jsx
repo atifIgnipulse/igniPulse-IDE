@@ -64,7 +64,7 @@ function PythonIDE() {
         path: "/socket.io/",  
         transports: ["websocket", "polling"],  
         withCredentials: true 
-    });
+      });
 
       socket.current.on("pyResponse", (message) => {
         setDisable(false);
@@ -80,6 +80,7 @@ function PythonIDE() {
       });
 
       socket.current.on("userInput", (message) => {
+        setDisable(false);
         // clearOutput()
         // Get the outputDiv
         const outputDiv = document.getElementById("outputDiv");
