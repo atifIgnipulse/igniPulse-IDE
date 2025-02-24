@@ -3,12 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const { spawn } = require('child_process');
 const http = require("http")
-const { Server } = require("socket.io")(server, {
-    cors: {
-        origin: "https://igniup.com",
-        credentials: true
-    }
-})
+const { Server } = require("socket.io")
 const app = express();
 const mysql = require('mysql2')
 
