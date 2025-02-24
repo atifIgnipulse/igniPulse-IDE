@@ -80,7 +80,7 @@ function PythonIDE() {
       });
 
       socket.current.on("userInput", (message) => {
-        clearOutput()
+        // clearOutput()
         // Get the outputDiv
         const outputDiv = document.getElementById("outputDiv");
         // outputDiv.innerText = "";
