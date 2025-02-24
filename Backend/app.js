@@ -12,9 +12,9 @@ const server = http.createServer(app);
 // 2. create io for socket
 const allowedOrigins = [
     "http://51.24.30.180:8080", 
-    "http://www.igniup.com",   // Add this without port 8080
-    "https://www.igniup.com",  // Include HTTPS version if needed
-    "http://igniup.com",       // Non-www version
+    "http://www.igniup.com",   
+    "https://www.igniup.com",  
+    "http://igniup.com",       
     "https://igniup.com"
 ]
 const io = new Server(server, {
@@ -130,7 +130,7 @@ io.on("connection", (socket) => {
 
 })
 
-app.post('/postData', async (req, res) => {
+app.post('/api/postData', async (req, res) => {
     connection.connect((err) => {
         if (err) {
             console.log(err)
@@ -158,7 +158,7 @@ app.post('/postData', async (req, res) => {
     }
 })
 
-app.get('/getDataBases', async (req, res) => {
+app.get('/api/getDataBases', async (req, res) => {
     connection.connect((err) => {
         if (err) {
             console.log(err)
@@ -179,7 +179,7 @@ app.get('/getDataBases', async (req, res) => {
 
 })
 
-app.get('/getTables', async (req, res) => {
+app.get('/api/getTables', async (req, res) => {
     const db_name = req.query.db;
     connection.connect((err) => {
         if (err) {
@@ -210,7 +210,7 @@ app.get('/getTables', async (req, res) => {
 
 })
 
-app.post('/switchDB', async (req, res) => {
+app.post('/api/switchDB', async (req, res) => {
     connection.connect((err) => {
         if (err) {
             console.log(err)
@@ -231,7 +231,7 @@ app.post('/switchDB', async (req, res) => {
     }
 })
 
-app.get(('/ping', (req, res)=>{
+app.get(('/api/ping', (req, res)=>{
     res.status(200).send("pong.")
 }))
 
