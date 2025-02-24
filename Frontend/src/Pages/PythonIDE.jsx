@@ -80,6 +80,7 @@ function PythonIDE() {
       });
 
       socket.current.on("userInput", (message) => {
+        clearOutput()
         // Get the outputDiv
         const outputDiv = document.getElementById("outputDiv");
         // outputDiv.innerText = "";
@@ -140,6 +141,7 @@ function PythonIDE() {
   const handleRun = async () => {
     // console.log("first")
     setDisable(true);
+    clearOutput()
     // Emit the input data to the server using Socket.IO
     socket.current.emit("runPy", editorContent);
   };
