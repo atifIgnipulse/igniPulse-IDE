@@ -21,7 +21,7 @@ function PythonIDE() {
     if (isDragging) {
       const newWidth =
         ((window.innerWidth - e.clientX) / window.innerWidth) * 100;
-      if (newWidth > 10 && newWidth < 80) {
+      if (newWidth > 30 && newWidth < 80) {
         // Set limits for resizing
         setOutputWidth(newWidth);
       }
