@@ -5,7 +5,7 @@ import CodeMirror from "@uiw/react-codemirror";
 import { python } from "@codemirror/lang-python";
 
 function PythonIDE() {
-  const [outputWidth, setOutputWidth] = useState(20);
+  const [outputWidth, setOutputWidth] = useState(30);
   const [outputHeight, setOutputHeight] = useState(20);
   const [isDragging, setIsDragging] = useState(false);
   const [mobile, setMobile] = useState(false);
