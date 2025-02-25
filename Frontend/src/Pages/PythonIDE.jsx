@@ -68,57 +68,85 @@ function PythonIDE() {
 
       socket.current.on("pyResponse", (message) => {
         setDisable(false);
-        // Display normal responses
-        // console.log(message.replace(/(\r\n|\n)/g, "<br>"))
+      
+        // Normalize newlines
+        let formattedMessage = message.replace(/\r\n|\r|\n/g, "\n");
+      
+        // Add <br> if message starts or ends with a newline
+        if (formattedMessage.startsWith("\n")) {
+          formattedMessage = "<br>" + formattedMessage.trimStart();
+        }
+        if (formattedMessage.endsWith("\n")) {
+          formattedMessage = formattedMessage.trimEnd() + "<br>";
+        }
+      
+        // Replace all internal newlines with <br>
+        formattedMessage = formattedMessage.replace(/\n/g, "<br>");
+      
+        // Create a new div for the output
         const res = document.createElement("div");
-        res.innerHTML = message.replace(/(\r\n|\n)/g, "<br>");
+        res.innerHTML = formattedMessage;
         res.style.borderBottom = "2px solid white";
         res.style.borderBottomStyle = "dashed";
         res.style.paddingBottom = "6px";
-        res.style.paddingTop = "6px";
+      
+        // Append to the outputDiv
         document.getElementById("outputDiv").appendChild(res);
       });
-
+      
       socket.current.on("userInput", (message) => {
         setDisable(false);
-        // clearOutput()
-        // Get the outputDiv
         const outputDiv = document.getElementById("outputDiv");
-        // outputDiv.innerText = "";
-
-        // Create a new div for the input prompt
+      
+        // Normalize newlines to ensure consistency
+        let formattedMessage = message.replace(/\r\n|\r|\n/g, "\n");
+      
+        // Extract lines while preserving newlines
+        const lines = formattedMessage.match(/[^\n]*(\n|$)/g).filter(line => line !== "");
+      
+        // Process all lines except the last one
+        lines.slice(0, -1).forEach((line) => {
+          const lineDiv = document.createElement("div");
+          lineDiv.innerHTML = line.replace(/\n/g, "<br>");
+          lineDiv.style.color = "white";
+          lineDiv.style.marginBottom = "5px";
+          outputDiv.appendChild(lineDiv);
+        });
+      
+        // Create a container for the input prompt
         const inputPromptDiv = document.createElement("div");
         inputPromptDiv.id = "inputPromptDiv";
-        inputPromptDiv.style.marginTop = "10px";
+        inputPromptDiv.style.marginTop = "0px";
         inputPromptDiv.style.display = "flex";
         inputPromptDiv.style.alignItems = "center";
-
-        // Create a label for the prompt message
+        inputPromptDiv.style.justifyContent = "start";
+      
+        // Create a label for the last line
         const promptLabel = document.createElement("label");
-        promptLabel.innerText = message;
+        promptLabel.innerHTML = lines[lines.length - 1].replace(/\n/g, "<br>");
         promptLabel.style.marginRight = "10px";
         promptLabel.style.color = "white";
-
+      
         // Create the input box
         const inputBox = document.createElement("input");
         inputBox.type = "text";
         inputBox.id = "dynamicInput";
-        inputBox.style.padding = "5px";
+        inputBox.style.padding = "0px";
         inputBox.style.outline = "none";
         inputBox.style.backgroundColor = "inherit";
         inputBox.style.color = "white";
-
-        // Append the label and input box to the inputPromptDiv
+      
+        // Append label and input box to inputPromptDiv
         inputPromptDiv.appendChild(promptLabel);
         inputPromptDiv.appendChild(inputBox);
-
-        // Append the inputPromptDiv to the outputDiv
+      
+        // Append inputPromptDiv to the outputDiv
         outputDiv.appendChild(inputPromptDiv);
-
+      
         // Focus on the input box
         inputBox.focus();
-
-        // Add an event listener for the Enter key
+      
+        // Handle Enter key event
         inputBox.addEventListener("keydown", (event) => {
           if (event.key === "Enter") {
             const userInput = inputBox.value.trim();
@@ -129,6 +157,8 @@ function PythonIDE() {
           }
         });
       });
+      
+      
     }
 
     return () => {
@@ -141,10 +171,14 @@ function PythonIDE() {
 
   const handleRun = async () => {
     // console.log("first")
-    setDisable(true);
-    clearOutput()
-    // Emit the input data to the server using Socket.IO
-    socket.current.emit("runPy", editorContent);
+    if(editorContent != ""){
+      setDisable(true);
+      clearOutput()
+      socket.current.close()
+      socket.current.connect()
+      // Emit the input data to the server using Socket.IO
+      socket.current.emit("runPy", editorContent);
+    }
   };
 
   const handleDownload = async () => {
@@ -341,7 +375,7 @@ function PythonIDE() {
             <Eraser size="18" />
           </button>
           <div
-            className="w-full leading-snug tracking-widest text-white text-justify text-[.9rem] overflow-y-auto overflow-x-hidden ps-2"
+            className="w-full h-full leading-snug tracking-widest text-white text-start text-[.9rem] overflow-auto ps-2"
             id="outputDiv"
           ></div>
         </div>
