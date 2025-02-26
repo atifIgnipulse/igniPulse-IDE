@@ -8,7 +8,6 @@ const app = express();
 const mysql = require('mysql2')
 const os = require("os");
 const crypto = require("crypto");
-const cookieParser = require("cookie-parser")
 
 
 
@@ -44,7 +43,6 @@ app.use(cors({
     credentials: true, 
 }));
 app.use(express.json());
-app.use(cookieParser())
 
 const connection = mysql.createPool({
     host: process.env.HOST,
