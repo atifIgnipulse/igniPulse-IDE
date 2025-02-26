@@ -12,41 +12,13 @@ import DatabaseLayout from "./DatabaseLayout";
 import TableDetail from "./TableDetail";
 
 function sqlIDETwo() {
-  const [outputHeight, setOutputHeight] = useState(20);
-  const [isDragging, setIsDragging] = useState(false);
   const dataRef = useRef(null);
 
-  const textAreaRef = useRef(null);
   const [editorContent, setEditorContent] = useState("");
   const [resDB, setResDb] = useState([]);
-  const [dataBases, setDataBases] = useState([]);
-
-  const [tabIsOpen, setTabIsOpen] = useState(false);
-
   const [db, setDb] = useState(() => window.localStorage.getItem("unique_id") || "");
   const [details, setDetails] = useState([])
 
-  const handleMouseDown = (e) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  
-
-  const handleMouseMoveVertical = (e) => {
-    if (isDragging) {
-      const newHeight =
-        ((window.innerHeight - e.clientY) / window.innerHeight) * 100;
-      if (newHeight > 10 && newHeight < 80) {
-        // Set limits for resizing
-        setOutputHeight(newHeight);
-      }
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
 
   const getTables = () => {
     // console.log(db);
@@ -82,8 +54,8 @@ function sqlIDETwo() {
 
   const handleRun = () => {
     // console.log("first");
-
-    Config.postData(editorContent, db)
+    if(editorContent != ""){
+      Config.postData(editorContent, db)
       .then((res) => {
         if (res.data.success) {
           toast.success("success");
@@ -91,14 +63,15 @@ function sqlIDETwo() {
           // getDataBases();
         } else {
           setResDb([]);
+          console.log(res.data);
           toast(res.data.sqlMessage);
-          // console.log(res.data);
         }
       })
       .catch((err) => {
-        toast.error(err.message || "An unexpected error occurred");
+        toast(err.message || "An unexpected error occurred");
         setResDb([]);
       });
+    }
   };
 
   const createDB = ()=>{
@@ -186,7 +159,7 @@ function sqlIDETwo() {
               Clear <Eraser size="18" />
             </button>
             {/* <DatabaseLayout dataBases={dataBases} getTables={getTables} /> */}
-            <div>Your Database: <strong>{db}</strong></div>
+            {/* <div className={`${db ? "text-green-700": "text-red-500"}`}><strong>{db ? "Connected": "Disconnected"}</strong></div> */}
             {/* <TableLayout tables={tables} /> */}
           </div>
           <div className="h-full grid place-items-center">
