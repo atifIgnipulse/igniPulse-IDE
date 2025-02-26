@@ -1,9 +1,16 @@
 
 @tailwind utilities;
 @import "tailwindcss";
-*{
+* {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
 }
 
+@import url("https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;600;700;800&display=swap");
+
+@layer base {
+  body {
+    font-family: "Urbanist", sans-serif;
+  }
+}

@@ -12,7 +12,7 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        <div className="w-screen h-screen">
+        <div className="w-screen h-screen overflow-hidden">
           <Routes>
             <Route path="/" element={<LandingPage/>}/>
             <Route path="/python" element={<PythonPage />} />
