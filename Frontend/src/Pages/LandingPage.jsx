@@ -28,7 +28,7 @@ const LandingPage = () => {
 
   return (
     
-    <div className="relative bg-gradient-to-r from-blue-950 to-purple-900 text-white min-h-screen flex flex-col items-center p-6 font-urbanist">
+    <div className="relative bg-gradient-to-r from-blue-950 to-purple-900 text-white min-h-screen flex flex-col items-center p-2 font-urbanist">
       {/* Website Name */}
       <motion.h1
         className="text-6xl font-extrabold text-white mb-8 tracking-widest drop-shadow-lg relative z-10"

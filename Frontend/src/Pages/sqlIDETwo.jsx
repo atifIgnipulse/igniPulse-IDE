@@ -60,7 +60,7 @@ function sqlIDETwo() {
         if (res.data.success) {
           toast.success("success");
           setResDb(res.data.result);
-          // getDataBases();
+          getTables()
         } else {
           setResDb([]);
           if(res.data.code == "ER_NO_SUCH_TABLE"){
