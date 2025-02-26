@@ -63,8 +63,12 @@ function sqlIDETwo() {
           // getDataBases();
         } else {
           setResDb([]);
-          console.log(res.data);
-          toast(res.data.sqlMessage);
+          if(res.data.code == "ER_NO_SUCH_TABLE"){
+            const cleanedMessage = res.data.sqlMessage.replace(/'[^.]+\.([^']+)'/, "'$1'");
+            toast(cleanedMessage)
+          }else{
+            toast(res.data.sqlMessage)
+          }
         }
       })
       .catch((err) => {
