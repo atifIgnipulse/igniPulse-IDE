@@ -82,15 +82,8 @@ function sqlIDETwo() {
 
   const handleRun = () => {
     // console.log("first");
-    const data = textAreaRef.current.view?.state?.doc?.toString();
-    if (data == "") {
-      setEditorContent("");
-      return;
-    } else {
-      setEditorContent(data);
-    }
 
-    Config.postData(data, db)
+    Config.postData(editorContent, db)
       .then((res) => {
         if (res.data.success) {
           toast.success("success");
@@ -146,14 +139,12 @@ function sqlIDETwo() {
       });
 
       const writeAbleStream = await fileHandler.createWritable();
-      await writeAbleStream.write(
-        textAreaRef.current.view.state.doc.toString()
-      );
+      await writeAbleStream.write(editorContent);
       await writeAbleStream.close();
     } else {
       const element = document.createElement("a");
       const file = new Blob(
-        [textAreaRef.current.view.state.doc.toString() || ""],
+        [editorContent || ""],
         {
           type: "text/plain",
         }
@@ -238,8 +229,8 @@ function sqlIDETwo() {
                 <CodeMirror
                   value={editorContent}
                   className="w-full border text-[1rem]"
-                  extensions={[sql()]}
-                  ref={textAreaRef}
+                  // extensions={[sql()]}
+                  onChange={(newContent) => setEditorContent(newContent)}
                   options={{
                     lineNumbers: true,
                   }}
