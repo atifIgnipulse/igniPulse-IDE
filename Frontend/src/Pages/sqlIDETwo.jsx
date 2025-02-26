@@ -137,7 +137,7 @@ function sqlIDETwo() {
   const handleDownload = async () => {
     if (window.showSaveFilePicker) {
       const fileHandler = await window.showSaveFilePicker({
-        suggestedName: "code.py",
+        suggestedName: "code.sql",
         types: [
           {
             accept: { "text/plain": [".sql"] },
