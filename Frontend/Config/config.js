@@ -11,9 +11,9 @@ const ENDPOINTS = {
     switch_db: `${BASE_URL}/switchDB`
 }
 
-const createDB = async ()=>{
+const createDB = async (id)=>{
     try {
-        const response = await axios.post(ENDPOINTS.create_db, {});
+        const response = await axios.post(ENDPOINTS.create_db, {id});
         return response
     } catch (error) {
         return error

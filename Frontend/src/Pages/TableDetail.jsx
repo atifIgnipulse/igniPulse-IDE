@@ -6,7 +6,6 @@ function TableDetail({details}) {
   const [visibleRows, setVisibleRows] = useState({});
 
   useEffect(()=>{
-    console.log(details)
   }, [details])
   
 

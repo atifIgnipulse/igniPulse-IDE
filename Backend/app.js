@@ -108,32 +108,37 @@ ${data}
     });
 });
 
-function getClientMacAddress() {
-    const interfaces = os.networkInterfaces();
-    for (const iface in interfaces) {
-      for (const config of interfaces[iface]) {
-        if (!config.internal && config.mac !== "00:00:00:00:00:00") {
-          return config.mac; 
-        }
-      }
-    }
-    return null; 
-}
 
 app.post('/api/createDB', async (req, res)=>{
-    const macAddress = getClientMacAddress();
-    if (!macAddress) {
-        return res.status(400).send("MAC address not found");
+    const unq_id = req.body.id;
+    if(!unq_id){
+        connection.query(`SELECT SCHEMA_NAME 
+            FROM INFORMATION_SCHEMA.SCHEMATA 
+            WHERE SCHEMA_NAME = ${unq_id};
+        `, (err, result)=>{
+            if(result){
+                res.send(unq_id)
+            }else{
+                const unique_id = crypto.randomUUID();
+                if (!unique_id) {
+                    return res.status(400).send("unique id not found");
+                }
+                const hash = crypto.createHash("md5").update(unique_id).digest("hex").slice(0, 8);
+                
+                connection.query(`CREATE DATABASE IF NOT EXISTS ${hash}`, (err, result)=>{
+                    if(err){
+                        return res.send(err)
+                    }else{
+                        return res.status(200).send(hash)
+                    }
+                })
+            }
+        })
+    }else{
+        res.send(unq_id)
     }
-    const hash = crypto.createHash("md5").update(macAddress).digest("hex").slice(0, 8);
+ 
     
-    connection.query(`CREATE DATABASE IF NOT EXISTS ${hash}`, (err, result)=>{
-        if(err){
-            return res.send(err)
-        }else{
-            res.status(200).send(hash)
-        }
-    })
 
 })
 

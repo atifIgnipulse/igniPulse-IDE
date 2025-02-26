@@ -23,7 +23,7 @@ function sqlIDETwo() {
 
   const [tabIsOpen, setTabIsOpen] = useState(false);
 
-  const [db, setDb] = useState("");
+  const [db, setDb] = useState(() => window.localStorage.getItem("unique_id") || "");
   const [details, setDetails] = useState([])
 
   const handleMouseDown = (e) => {
@@ -31,11 +31,7 @@ function sqlIDETwo() {
     setIsDragging(true);
   };
 
-  useEffect(() => {
-    if (dataRef.current) {
-      dataRef.current.scrollTop = 0;
-    }
-  }, [resDB]);
+  
 
   const handleMouseMoveVertical = (e) => {
     if (isDragging) {
@@ -54,9 +50,6 @@ function sqlIDETwo() {
 
   const getTables = () => {
     // console.log(db);
-    const db = window.localStorage.getItem("db_name")
-    setDb(db)
-
     Config.getTables(db)
       .then((res) => {
         // console.log(res.data)
@@ -116,11 +109,12 @@ function sqlIDETwo() {
   };
 
   const createDB = ()=>{
-    Config.createDB().then(res=>{
+    const inq_id = window.localStorage.unique_id;
+    Config.createDB(inq_id).then(res=>{
       if(res.status === 200){
-        const db_name = res.data;
-        // console.log(db_name)
-        window.localStorage.setItem("db_name", db_name);
+        const unique_id = res.data;
+        window.localStorage.setItem("unique_id", unique_id);
+        setDb(unique_id)
       }
     }).catch(err=>{
       console.log(err)
@@ -133,6 +127,12 @@ function sqlIDETwo() {
     // getDataBases();
     getTables();
   }, []);
+
+  useEffect(() => {
+    if (dataRef.current) {
+      dataRef.current.scrollTop = 0;
+    } 
+  }, [resDB]);
 
   const handleDownload = async () => {
     if (window.showSaveFilePicker) {
