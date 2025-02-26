@@ -6,6 +6,12 @@ const http = require("http")
 const { Server } = require("socket.io")
 const app = express();
 const mysql = require('mysql2')
+const os = require("os");
+const crypto = require("crypto");
+const cookieParser = require("cookie-parser")
+
+
+
 
 // 1. create hppt server for app
 const server = http.createServer(app);
@@ -17,6 +23,9 @@ const allowedOrigins = [
     "http://igniup.com",       
     "https://igniup.com"
 ]
+// const allowedOrigins = [
+//     "http://localhost:5173"
+// ]
 
 const io = new Server(server, {
     cors: {
@@ -30,16 +39,18 @@ const io = new Server(server, {
     }
 });
 
-
-app.use(cors());
-
+app.use(cors({
+    origin: allowedOrigins,
+    credentials: true, 
+}));
 app.use(express.json());
+app.use(cookieParser())
 
-
-const connection = mysql.createConnection({
+const connection = mysql.createPool({
     host: process.env.HOST,
     user: process.env.USER,
-    password: process.env.PASSWORD
+    password: process.env.PASSWORD,
+    multipleStatements: true
 })
 
 
@@ -99,67 +110,100 @@ ${data}
     });
 });
 
+function getClientMacAddress() {
+    const interfaces = os.networkInterfaces();
+    for (const iface in interfaces) {
+      for (const config of interfaces[iface]) {
+        if (!config.internal && config.mac !== "00:00:00:00:00:00") {
+          return config.mac; 
+        }
+      }
+    }
+    return null; 
+}
+
+app.post('/api/createDB', async (req, res)=>{
+    const macAddress = getClientMacAddress();
+    if (!macAddress) {
+        return res.status(400).send("MAC address not found");
+    }
+    const hash = crypto.createHash("md5").update(macAddress).digest("hex").slice(0, 8);
+    
+    connection.query(`CREATE DATABASE IF NOT EXISTS ${hash}`, (err, result)=>{
+        if(err){
+            return res.send(err)
+        }else{
+            res.status(200).send(hash)
+        }
+    })
+
+})
 
 
 app.post('/api/postData', async (req, res) => {
-    connection.connect((err) => {
-        if (err) {
-            console.log(err)
-        } else {
-            console.log("connected to mysql")
-        }
-    })
+   
     try {
         const { data } = req.body;
-        if (!data) {
-            return res.status(400).json({ error: "SQL script is required." });
+        const {db} = req.body
+        if (!data || !db) {
+            return res.status(400).json({ error: "SQL script is required. || databse name is required" });
         }
-
-        connection.query(data, (err, result) => {
-            if (err) {
-                res.send(err)
-            } else {
-                // console.log(result[0])
-                res.json({ success: true, result });
-
+        connection.query(`use ${db};`, (err, result)=>{
+            if(err){
+                return res.send(err)
+            }else{
+                connection.query(data, (err, result) => {
+                    if (err) {
+                        res.send(err)
+                    } else {
+                        // console.log(result[0])
+                        res.json({ success: true, result });
+        
+                    }
+                })
             }
         })
+        
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 })
 
-app.get('/api/getDataBases', async (req, res) => {
-    connection.connect((err) => {
-        if (err) {
-            console.log(err)
-        } else {
-            console.log("connected to mysql")
-        }
-    })
-    connection.query("show databases", (err, result) => {
-        if (err) {
-            res.send(err)
-        } else {
-            res.send(result.map((database) => {
+// app.get('/api/getDataBases', async (req, res) => {
+//     const {db} = req.body;
+//     if (!db) {
+//         return res.status(400).json({ error: "databse name is required" });
+//     }
 
-                return database.Database
-            }))
-        }
-    })
+//     connection.query(`use ${db};`, (err, result)=>{
+//         if(err){
+//             return res.send(err)
+//         }else{
+//             connection.query("show databases", (err, result) => {
+//                 if (err) {
+//                     res.send(err)
+//                 } else {
+//                     res.send(result.map((database) => {
 
-})
+//                         return database.Database
+//                     }))
+//                 }
+//             })
+//         }
+//     })
+// })
+
 
 app.get('/api/getTables', async (req, res) => {
     const db_name = req.query.db;
-    connection.connect((err) => {
-        if (err) {
-            console.log(err)
-        } else {
-            console.log("connected to mysql")
-        }
-    })
-
+    // connection.connect((err) => {
+    //     if (err) {
+    //         console.log(err)
+    //     } else {
+    //         console.log("connected to mysql")
+    //     }
+    // })
+  
     connection.query(`use ${db_name};`, (err, result) => {
         if (err) {
             res.send(err)
@@ -181,26 +225,26 @@ app.get('/api/getTables', async (req, res) => {
 
 })
 
-app.post('/api/switchDB', async (req, res) => {
-    connection.connect((err) => {
-        if (err) {
-            console.log(err)
-        } else {
-            console.log("connected to mysql")
-        }
-    })
-    try {
-        connection.query(`use ${req.body.database};`, (err, result) => {
-            if (err) {
-                return res.send(err);
-            } else {
-                res.send(result)
-            }
-        })
-    } catch (error) {
-        res.send(error)
-    }
-})
+// app.post('/api/switchDB', async (req, res) => {
+//     // connection.connect((err) => {
+//     //     if (err) {
+//     //         console.log(err)
+//     //     } else {
+//     //         console.log("connected to mysql")
+//     //     }
+//     // })
+//     try {
+//         connection.query(`use ${req.body.database};`, (err, result) => {
+//             if (err) {
+//                 return res.send(err);
+//             } else {
+//                 res.send(result)
+//             }
+//         })
+//     } catch (error) {
+//         res.send(error)
+//     }
+// })
 
 app.get(('/api/ping', (req, res)=>{
     res.status(200).send("pong.")

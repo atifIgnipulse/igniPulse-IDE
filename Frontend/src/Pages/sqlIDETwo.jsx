@@ -23,7 +23,7 @@ function sqlIDETwo() {
 
   const [tabIsOpen, setTabIsOpen] = useState(false);
 
-  const [tables, setTables] = useState([]);
+  const [db, setDb] = useState("");
   const [details, setDetails] = useState([])
 
   const handleMouseDown = (e) => {
@@ -52,8 +52,11 @@ function sqlIDETwo() {
     setIsDragging(false);
   };
 
-  const getTables = (db) => {
+  const getTables = () => {
     // console.log(db);
+    const db = window.localStorage.getItem("db_name")
+    setDb(db)
+
     Config.getTables(db)
       .then((res) => {
         // console.log(res.data)
@@ -73,19 +76,19 @@ function sqlIDETwo() {
       });
   };
 
-  const getDataBases = () => {
-    Config.getDataBases()
-      .then((res) => {
-        // console.log(res.data)
-        setDataBases([...res.data]);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+  // const getDataBases = () => {
+  //   Config.getDataBases()
+  //     .then((res) => {
+  //       // console.log(res.data)
+  //       setDataBases([...res.data]);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // };
 
   const handleRun = () => {
-    console.log("first");
+    // console.log("first");
     const data = textAreaRef.current.view?.state?.doc?.toString();
     if (data == "") {
       setEditorContent("");
@@ -94,16 +97,16 @@ function sqlIDETwo() {
       setEditorContent(data);
     }
 
-    Config.postData(data)
+    Config.postData(data, db)
       .then((res) => {
         if (res.data.success) {
           toast.success("success");
           setResDb(res.data.result);
-          getDataBases();
+          // getDataBases();
         } else {
           setResDb([]);
           toast(res.data.sqlMessage);
-          console.log(res.data);
+          // console.log(res.data);
         }
       })
       .catch((err) => {
@@ -112,8 +115,23 @@ function sqlIDETwo() {
       });
   };
 
+  const createDB = ()=>{
+    Config.createDB().then(res=>{
+      if(res.status === 200){
+        const db_name = res.data;
+        // console.log(db_name)
+        window.localStorage.setItem("db_name", db_name);
+      }
+    }).catch(err=>{
+      console.log(err)
+    })
+  }
+
+
   useEffect(() => {
-    getDataBases();
+    createDB();
+    // getDataBases();
+    getTables();
   }, []);
 
   const handleDownload = async () => {
@@ -176,7 +194,8 @@ function sqlIDETwo() {
             >
               Clear <Eraser size="18" />
             </button>
-            <DatabaseLayout dataBases={dataBases} getTables={getTables} />
+            {/* <DatabaseLayout dataBases={dataBases} getTables={getTables} /> */}
+            <div>Your Database: <strong>{db}</strong></div>
             {/* <TableLayout tables={tables} /> */}
           </div>
           <div className="h-full grid place-items-center">
