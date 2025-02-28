@@ -71,37 +71,34 @@ ${data}
 
     const execPy = (socket, code) => {
         const pyProcess = spawn("python3", ["-c", code]);
-
+    
         pyProcess.stdout.on("data", (data) => {
             const output = data.toString().trim();
-            // console.log("Python Output:", output);
-
+    
             if (output.endsWith("INPUT_REQUEST")) {
-                // Extract only the prompt part
                 const promptMessage = output.replace("INPUT_REQUEST", "");
                 socket.emit("userInput", promptMessage);
-                // console.log(promptMessage)
-
-                // Listen for user input dynamically
+    
                 socket.once("userEntry", (userInput) => {
-                    // console.log("User Input:", userInput);
                     pyProcess.stdin.write(userInput + "\n");
                 });
             } else {
-                // Send normal Python output
-                socket.emit("pyResponse", output);
+                if (output) {
+                    socket.emit("pyResponse", output);
+                }
             }
         });
-
+    
         pyProcess.stderr.on("data", (data) => {
             socket.emit("pyResponse", "Error: " + data.toString());
         });
-
+    
         pyProcess.on("close", (code) => {
             console.log("Python process exited with code:", code);
-            // socket.emit("pyResponse", `Process exited with code ${code}`);
+            socket.emit("EXIT_SUCCESS", "EXIT_SUCCESS"); 
         });
     };
+    
 
     socket.on("disconnect", () => {
         console.log("disconnected user:", socket.id);

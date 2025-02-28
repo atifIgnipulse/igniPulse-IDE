@@ -173,13 +173,13 @@ function sqlIDETwo() {
           {/* Left Side Controls */}
           <div className="flex items-center gap-x-3">
             <button
-              className="cursor-pointer flex items-center gap-x-2 bg-red-500 px-3 py-3 rounded-md hover:bg-red-600 text-black text-xs font-semibold tracking-wide transition"
+              className="cursor-pointer flex items-center gap-x-2 bg-red-500 px-3 py-3 rounded-md hover:bg-red-600 text-white text-xs font-semibold tracking-wide transition"
               onClick={() => setEditorContent("")}
             >
               <Eraser size="18" /> Clear
             </button>
             <button
-              className="cursor-pointer flex items-center gap-x-2 bg-[#7FBA00] px-3 py-3 rounded-md hover:bg-[#86b228] text-black/80 text-xs font-semibold tracking-wide transition"
+              className="cursor-pointer flex items-center gap-x-2 bg-[#7FBA00] px-3 py-3 rounded-md hover:bg-[#86b228] text-white text-xs font-semibold tracking-wide transition"
               onClick={handleRun}
             >
               <Play size="18" /> Execute
@@ -189,13 +189,13 @@ function sqlIDETwo() {
           {/* Right Side Controls */}
           <div className="flex items-center gap-x-3">
             <button
-              className=" cursor-pointer flex items-center gap-x-2 bg-[#2677C7] px-3 py-3 rounded-md hover:bg-[#0072C6] text-black text-xs font-semibold tracking-wide transition"
+              className=" cursor-pointer flex items-center gap-x-2 bg-[#2677C7] px-3 py-3 rounded-md hover:bg-[#0072C6] text-white text-xs font-semibold tracking-wide transition"
               onClick={openFile}
             >
               <File size="18" /> Open Script  
             </button>
             <button
-              className="cursor-pointer flex items-center gap-x-2 bg-[#2677C7] px-3 py-3 rounded-md hover:bg-[#0072C6] text-black text-xs font-semibold tracking-wide transition"
+              className="cursor-pointer flex items-center gap-x-2 bg-[#2677C7] px-3 py-3 rounded-md hover:bg-[#0072C6] text-white text-xs font-semibold tracking-wide transition"
               onClick={handleDownload}
             >
               <Save size="18" /> Save Script
