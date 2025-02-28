@@ -28,20 +28,20 @@ const LandingPage = () => {
 
   return (
     
-    <div className="relative bg-gradient-to-r from-blue-950 to-purple-900 text-white min-h-screen flex flex-col items-center p-2 font-urbanist">
+    <div className="relative bg-gradient-to-r from-blue-950 to-purple-900 text-white min-h-screen flex flex-col items-center justify-between p-2 font-urbanist">
       {/* Website Name */}
       <motion.h1
-        className="text-6xl font-extrabold text-white mb-8 tracking-widest drop-shadow-lg relative z-10"
+        className="text-6xl font-extrabold text-white tracking-wide drop-shadow-xl relative z-10 pt-28"
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
       >
-        igniUp
+        IgniUp
       </motion.h1>
 
       {/* Motivational Quote */}
       <motion.h2
-        className="text-3xl italic text-center mb-12 max-w-3xl text-gray-300 bg-gray-800/80 px-8 py-6 rounded-lg shadow-xl border border-gray-700 relative z-10"
+        className="text-lg italic text-center max-w-xl tracking-wider text-gray-200 bg-gray-800/40 px-8 py-6 rounded-lg shadow-xl relative z-10"
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1, delay: 0.5 }}
@@ -74,7 +74,7 @@ const LandingPage = () => {
         ))}
       </div>
 
-      <footer className="mt-16 text-gray-400 text-sm text-center border-t border-gray-700 w-full py-4">
+      <footer className="text-gray-400 text-sm text-center border-gray-700 w-full">
         © 2025 Ignipulse. Empowering IT education and innovation, one line of
         code at a time.
       </footer>

@@ -17,7 +17,7 @@ const toggleVisibility = (index) => {
 };
 
 return (
-  <div className="w-[95%] h-full py-4 px-">
+  <div className="w-[95%] h-full py-2">
   {/* Header */}
   <p className="text-[#1E293B] rounded-lg py-3 text-md font-bold text-center w-full bg-white shadow-md tracking-widest mb-4">
     Available Tables

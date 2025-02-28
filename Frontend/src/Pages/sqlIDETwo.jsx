@@ -74,14 +74,14 @@ function sqlIDETwo() {
                 /'[^.]+\.([^']+)'/,
                 "'$1'"
               );
-              toast(cleanedMessage);
+              toast.error(cleanedMessage);
             } else {
-              toast(res.data.sqlMessage);
+              toast.error(res.data.sqlMessage);
             }
           }
         })
         .catch((err) => {
-          toast(err.message || "An unexpected error occurred");
+          toast.error(err.message || "An unexpected error occurred");
           setResDb([]);
         });
     }
@@ -93,8 +93,11 @@ function sqlIDETwo() {
       .then((res) => {
         if (res.status === 200) {
           const unique_id = res.data;
-          window.localStorage.setItem("unique_id", unique_id);
-          setDb(unique_id);
+          if(unique_id != inq_id){
+            window.localStorage.removeItem("unique_id");
+            window.localStorage.setItem("unique_id", unique_id);
+            setDb(unique_id);
+          }
         }
       })
       .catch((err) => {
@@ -159,38 +162,40 @@ function sqlIDETwo() {
   };
 
   return (
-    <>
-      <div className="flex flex-col h-screen w-screen overflow-hidden bg-[#374151]">
-        {/* Header Section */}
-        <div className="flex h-[8%] w-full px-6 items-center justify-between bg-[#2D3748] shadow-md">
+    <div className="flex h-screen w-screen bg-gradient-to-r from-blue-950 to-purple-900">
+      <div className=" w-2/11 h-full flex items-center justify-center overflow-auto bg-black/10 px-2">
+        <TableDetail details={details} />
+      </div>
+
+      <div className="flex flex-col items-end w-full h-full overflow-hidden">
+        
+        <div className="flex h-[8%] w-full px-3 items-center justify-between  shadow-md">
           {/* Left Side Controls */}
           <div className="flex items-center gap-x-3">
             <button
-              className="cursor-pointer flex items-center gap-x-2 bg-red-500 px-3 py-2 rounded-md hover:bg-red-600 text-white text-sm font-semibold tracking-wide transition"
+              className="cursor-pointer flex items-center gap-x-2 bg-red-500 px-3 py-3 rounded-md hover:bg-red-600 text-black text-xs font-semibold tracking-wide transition"
               onClick={() => setEditorContent("")}
             >
               <Eraser size="18" /> Clear
             </button>
+            <button
+              className="cursor-pointer flex items-center gap-x-2 bg-[#7FBA00] px-3 py-3 rounded-md hover:bg-[#86b228] text-black/80 text-xs font-semibold tracking-wide transition"
+              onClick={handleRun}
+            >
+              <Play size="18" /> Execute
+            </button>
           </div>
-
-          {/* Center Execute Button */}
-          <button
-            className="cursor-pointer flex items-center gap-x-2 bg-[#7FBA00] px-4 py-2 rounded-md hover:bg-[#86b228] text-zinc-900 text-sm font-semibold tracking-wide transition"
-            onClick={handleRun}
-          >
-            <Play size="18" /> Execute
-          </button>
 
           {/* Right Side Controls */}
           <div className="flex items-center gap-x-3">
             <button
-              className=" cursor-pointer flex items-center gap-x-2 bg-[#2677C7] px-3 py-2 rounded-md hover:bg-[#0072C6] text-white text-sm font-semibold tracking-wide transition"
+              className=" cursor-pointer flex items-center gap-x-2 bg-[#2677C7] px-3 py-3 rounded-md hover:bg-[#0072C6] text-black text-xs font-semibold tracking-wide transition"
               onClick={openFile}
             >
-              <File size="18" /> Open Script
+              <File size="18" /> Open Script  
             </button>
             <button
-              className="cursor-pointer flex items-center gap-x-2 bg-[#374151] px-3 py-2 rounded-md hover:bg-[#323a47] text-white text-sm font-semibold tracking-wide transition"
+              className="cursor-pointer flex items-center gap-x-2 bg-[#2677C7] px-3 py-3 rounded-md hover:bg-[#0072C6] text-black text-xs font-semibold tracking-wide transition"
               onClick={handleDownload}
             >
               <Save size="18" /> Save Script
@@ -198,18 +203,14 @@ function sqlIDETwo() {
           </div>
         </div>
 
-        {/* Main Content Section */}
         <div className="flex w-full h-[92%] overflow-hidden">
           {/* Sidebar - Table Details */}
-          <div className="bg-[#323A47] w-2/11 h-full flex items-center justify-center overflow-auto border-r border-gray-700 p-4">
-            <TableDetail details={details} />
-          </div>
 
           {/* Main Editor & Data Section */}
-          <div className="w-9/11 h-full flex flex-col">
+          <div className="w-full h-full flex flex-col">
             {/* Code Editor Section */}
             <div className="h-1/6 w-full p-3">
-              <div className="h-full overflow-y-auto border border-gray-600 rounded-md bg-[#1E293B]">
+              <div className="h-full overflow-y-auto shadow-lg border border-gray-200 rounded-md bg-[#2A313D] scrollbar-custom">
                 <CodeMirror
                   value={editorContent}
                   className="w-full text-[1rem]"
@@ -234,7 +235,7 @@ function sqlIDETwo() {
             {/* Data Output Section */}
             <div className="w-full h-5/6 overflow-auto p-3">
               <div
-                className="w-full h-full overflow-auto border border-gray-600 rounded-md bg-[#1E293B]"
+                className="w-full h-full overflow-auto rounded-md bg-[#2A313D] scrollbar-custom"
                 ref={dataRef}
               >
                 {resDB.length > 0 && <Data res={resDB} />}
@@ -255,20 +256,31 @@ function sqlIDETwo() {
           duration: 5000,
           removeDelay: 1000,
           style: {
-            background: "#363636",
+            background: "green",
             color: "#fff",
           },
 
           success: {
             duration: 3000,
             iconTheme: {
-              primary: "green",
+              primary: "white",
               secondary: "black",
+            },
+          },
+          error: {
+            duration: 3000,
+            style: {
+              backgroundColor: "red",
+              color: "white",
+            },
+            iconTheme: {
+              primary: "white",
+              secondary: "red",
             },
           },
         }}
       />
-    </>
+    </div>
   );
 }
 

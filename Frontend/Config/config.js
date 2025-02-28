@@ -5,6 +5,7 @@ const BASE_URL = "https://igniup.com/api";
 
 const ENDPOINTS = {
     create_db : `${BASE_URL}/createDB`,
+    delete_db : `${BASE_URL}/DDBSES`,
     post_data : `${BASE_URL}/postData`,
     get_data : `${BASE_URL}/getDataBases`,
     get_tables: `${BASE_URL}/getTables`,
@@ -14,6 +15,15 @@ const ENDPOINTS = {
 const createDB = async (id)=>{
     try {
         const response = await axios.post(ENDPOINTS.create_db, {id});
+        return response
+    } catch (error) {
+        return error
+    }
+}
+
+const dropDbs = async ()=>{
+    try {
+        const response = await axios.get(ENDPOINTS.delete_db)
         return response
     } catch (error) {
         return error
@@ -64,4 +74,4 @@ const getTables = async (db)=>{
 //     }
 // }
 
-export default {createDB, postData, getTables}
+export default {createDB, dropDbs, postData, getTables}

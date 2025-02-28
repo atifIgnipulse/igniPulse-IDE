@@ -227,7 +227,7 @@ function PythonIDE() {
 
   return (
     <div
-      className="overflow-hidden w-full h-full flex flex-col items-center justify-center bg-[#101828]"
+      className="overflow-hidden w-full h-screen flex flex-col items-center justify-center bg-[#101828]"
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
     >
@@ -252,7 +252,7 @@ function PythonIDE() {
                 <div className=" border-4 border-t-transparent border-white rounded-full animate-spin"></div>
               </div>
             ) : (
-              <div className="h-full w-full flex items-center justify-between gap-x-1">
+              <div className="h-full w-full flex items-center justify-between gap-x-1 text-sm">
                 <>Execute</> <Play  size="14"/>
               </div>
             )}

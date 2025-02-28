@@ -14,3 +14,31 @@
     font-family: "Urbanist", sans-serif;
   }
 }
+
+/* Custom scrollbar styles */
+.scrollbar-custom::-webkit-scrollbar {
+  width: 5px; /* Width of the scrollbar */
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background-color: white; /* Color of the scrollbar thumb */
+  border-radius: 8px; /* Rounded corners for the scrollbar thumb */
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+  background-color: transparent; /* Background color of the track */
+}
+
+/* In your global styles, or in a custom CSS file */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 5px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: #000; /* Black color */
+  border-radius: 10px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background-color: #f0f0f0; /* Light background color for track */
+}

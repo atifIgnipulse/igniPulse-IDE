@@ -8,12 +8,12 @@ const Data = ({ res }) => {
         <div className="table-container bg-gray-50  rounded-lg shadow-md">
           <table className="w-full border-collapse">
             {/* Table Header */}
-            <thead className="sticky top-0 bg-[#0072C6] text-white z-10">
+            <thead className="sticky top-0 bg-[#192150] text-white z-10">
               <tr>
                 {Object.keys(res[0]).map((key) => (
                   <th
                     key={key}
-                    className="px-4 py-3 border-2 border-[#005a9e] text-white tracking-wider text-left uppercase"
+                    className="px-4 py-3 border-2 border-[#192150] text-white tracking-wider text-left uppercase"
                   >
                     {key}
                   </th>
