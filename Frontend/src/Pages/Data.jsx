@@ -13,7 +13,7 @@ const Data = ({ res }) => {
                 {Object.keys(res[0]).map((key) => (
                   <th
                     key={key}
-                    className="px-4 py-3 border-2 border-[#192150] text-white tracking-wider text-left uppercase"
+                    className="px-3 py-3 text-sm border-e-2 border-[#818080] text-white tracking-wider text-left uppercase"
                   >
                     {key}
                   </th>
@@ -33,7 +33,7 @@ const Data = ({ res }) => {
                   {Object.keys(row).map((key) => (
                     <td
                       key={key}
-                      className="border-2 border-gray-300 px-4 py-2 text-start text-gray-800"
+                      className="border-2 border-gray-300 px-4 py-2 text-start text-sm text-gray-800"
                     >
                       {row[key]}
                     </td>

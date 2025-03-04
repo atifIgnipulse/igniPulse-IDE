@@ -2,6 +2,7 @@ import { React, useState, useRef, useEffect } from "react";
 import { Database, Eraser, File, Play, Save } from "lucide-react";
 import { io } from "socket.io-client";
 import CodeMirror from "@uiw/react-codemirror";
+import {EditorView} from "@codemirror/view";
 import { sql } from "@codemirror/lang-sql";
 import Config from "../../Config/config";
 import toast, { Toaster } from "react-hot-toast";
@@ -13,13 +14,51 @@ import TableDetail from "./TableDetail";
 
 function sqlIDETwo() {
   const dataRef = useRef(null);
-
+  const editorRef = useRef(null);
   const [editorContent, setEditorContent] = useState("");
   const [resDB, setResDb] = useState([]);
   const [db, setDb] = useState(
     () => window.localStorage.getItem("unique_id") || ""
   );
   const [details, setDetails] = useState([]);
+
+
+  const customScrollbar = EditorView.theme({
+    ".cm-scroller": { 
+      scrollbarWidth: "thin", // For Firefox
+    },
+    "::-webkit-scrollbar": {
+      width: "8px",  // Scrollbar width
+      height: "8px", // Horizontal scrollbar height
+    },
+    "::-webkit-scrollbar-track": {
+      background: "#1E1E1E", // Track color
+      borderRadius: "5px",
+    },
+    "::-webkit-scrollbar-thumb": {
+      background: "#007AFF", // Thumb color
+      borderRadius: "5px",
+    },
+    "::-webkit-scrollbar-thumb:hover": {
+      background: "#005BBB", // Thumb hover effect
+    }
+  });
+  
+  const fullHeightEditor = EditorView.theme({
+    ".cm-scroller": { 
+      maxHeight: "14rem !important",  // Fixed height for scrolling
+      overflow: "auto !important", // Ensure scrollbars appear when needed
+    },
+    ".cm-content": { 
+      minHeight: "14rem !important",  // Prevents extra height
+      whiteSpace: "pre",  // Prevents text wrapping
+    },
+    ".cm-gutter": { 
+      minHeight: "14rem !important",  // Aligns with `.cm-content`
+      
+    },
+  });
+  
 
   const getTables = () => {
     // console.log(db);
@@ -161,126 +200,133 @@ function sqlIDETwo() {
     setEditorContent(fileContent);
   };
 
+  const handleClear = ()=>{
+    if(editorContent){
+      setEditorContent("")
+      if (editorRef.current) {
+        editorRef.current.focus();
+      }
+    }
+  }
+
   return (
-    <div className="flex h-screen w-screen bg-gradient-to-r from-blue-950 to-purple-900">
-      <div className=" w-2/11 h-full flex items-center justify-center overflow-auto bg-black/10 px-2">
-        <TableDetail details={details} />
-      </div>
-
-      <div className="flex flex-col items-end w-full h-full overflow-hidden">
-        
-        <div className="flex h-[8%] w-full px-3 items-center justify-between  shadow-md">
-          {/* Left Side Controls */}
-          <div className="flex items-center gap-x-3">
-            <button
-              className="cursor-pointer flex items-center gap-x-2 bg-red-500 px-3 py-3 rounded-md hover:bg-red-600 text-white text-xs font-semibold tracking-wide transition"
-              onClick={() => setEditorContent("")}
-            >
-              <Eraser size="18" /> Clear
-            </button>
-            <button
-              className="cursor-pointer flex items-center gap-x-2 bg-[#7FBA00] px-3 py-3 rounded-md hover:bg-[#86b228] text-white text-xs font-semibold tracking-wide transition"
-              onClick={handleRun}
-            >
-              <Play size="18" /> Execute
-            </button>
-          </div>
-
-          {/* Right Side Controls */}
-          <div className="flex items-center gap-x-3">
-            <button
-              className=" cursor-pointer flex items-center gap-x-2 bg-[#2677C7] px-3 py-3 rounded-md hover:bg-[#0072C6] text-white text-xs font-semibold tracking-wide transition"
-              onClick={openFile}
-            >
-              <File size="18" /> Open Script  
-            </button>
-            <button
-              className="cursor-pointer flex items-center gap-x-2 bg-[#2677C7] px-3 py-3 rounded-md hover:bg-[#0072C6] text-white text-xs font-semibold tracking-wide transition"
-              onClick={handleDownload}
-            >
-              <Save size="18" /> Save Script
-            </button>
-          </div>
-        </div>
-
-        <div className="flex w-full h-[92%] overflow-hidden">
-          {/* Sidebar - Table Details */}
-
-          {/* Main Editor & Data Section */}
-          <div className="w-full h-full flex flex-col">
-            {/* Code Editor Section */}
-            <div className="h-1/6 w-full p-3">
-              <div className="h-full overflow-y-auto shadow-lg border border-gray-200 rounded-md bg-[#2A313D] scrollbar-custom">
-                <CodeMirror
-                  value={editorContent}
-                  className="w-full text-[1rem]"
-                  onChange={(newContent) => setEditorContent(newContent)}
-                  theme="dark"
-                  options={{
-                    lineNumbers: true,
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Records Count */}
-            <div className="w-full h-[5%] px-4 flex items-center text-white">
-              {resDB.length > 0 && (
-                <div className="w-fit">
-                  Total records: <strong>{resDB.length}</strong>
-                </div>
-              )}
-            </div>
-
-            {/* Data Output Section */}
-            <div className="w-full h-5/6 overflow-auto p-3">
-              <div
-                className="w-full h-full overflow-auto rounded-md bg-[#2A313D] scrollbar-custom"
-                ref={dataRef}
-              >
-                {resDB.length > 0 && <Data res={resDB} />}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <Toaster
-        position="top-center"
-        reverseOrder={false}
-        gutter={8}
-        containerClassName=""
-        containerStyle={{}}
-        toastOptions={{
-          className: "",
-          duration: 5000,
-          removeDelay: 1000,
-          style: {
-            background: "green",
-            color: "#fff",
-          },
-
-          success: {
-            duration: 3000,
-            iconTheme: {
-              primary: "white",
-              secondary: "black",
-            },
-          },
-          error: {
-            duration: 3000,
-            style: {
-              backgroundColor: "red",
-              color: "white",
-            },
-            iconTheme: {
-              primary: "white",
-              secondary: "red",
-            },
-          },
-        }}
-      />
+    <div className="flex h-screen w-screen bg-white text-black">
+    <div className="w-2/11 h-full flex items-center justify-center overflow-auto bg-black/10 px-2">
+      <TableDetail details={details} />
     </div>
+  
+    <div className="flex flex-col items-end w-full h-full overflow-hidden">
+      {/* Top Controls */}
+      <div className="flex h-[8%] w-full px-3 items-center justify-between shadow-md bg-gray-100">
+        {/* Left Side Controls */}
+        <div className="flex items-center gap-x-3">
+          <button
+            className="cursor-pointer flex items-center gap-x-2 bg-red-500 px-3 py-2 rounded-lg hover:bg-red-600 text-white text-xs font-semibold tracking-wide transition"
+            onClick={handleClear}
+          >
+            <Eraser size="18" /> Clear
+          </button>
+          <button
+            className="cursor-pointer flex items-center gap-x-2 bg-green-600 px-3 py-2 rounded-lg hover:bg-ggreen-700 text-white text-xs font-semibold tracking-wide transition"
+            onClick={handleRun}
+          >
+            <Play size="18" /> Execute
+          </button>
+        </div>
+  
+        {/* Right Side Controls */}
+        <div className="flex items-center gap-x-3">
+          <button
+            className="cursor-pointer flex items-center gap-x-2 bg-blue-700 px-3 py-2 rounded-lg hover:bg-blue-800 text-white text-xs font-semibold tracking-wide transition"
+            onClick={openFile}
+          >
+            <File size="18" /> Open Script
+          </button>
+          <button
+            className="cursor-pointer flex items-center gap-x-2 bg-blue-700 px-3 py-2 rounded-lg hover:bg-blue-800 text-white text-xs font-semibold tracking-wide transition"
+            onClick={handleDownload}
+          >
+            <Save size="18" /> Save Script
+          </button>
+        </div>
+      </div>
+  
+      {/* Main Content */}
+      <div className="flex w-full h-[92%] overflow-hidden">
+        <div className="w-full h-full flex flex-col ">
+          {/* Code Editor Section */}
+            {/* <div className="h-1/3 w-full overflow-auto shadow-lg border border-gray-300 rounded-lg bg-gray-100 scrollbar-custom"> */}
+              <CodeMirror
+                value={editorContent}
+                className="w-full h-2/6 text-[1rem] scrollbar-custom border  border-gray-300 rounded-xl shadow-md overflow-hidden"
+                onChange={(newContent) => setEditorContent(newContent)}
+                theme="light"
+                // height="100%"
+                extensions={[fullHeightEditor, customScrollbar]}
+                options={{
+                  lineNumbers: true,
+                }}
+                onCreateEditor={(editor) => {
+                  editorRef.current = editor;
+                }}
+              />
+            {/* </div> */}
+  
+          {/* Records Count */}
+          {/* <div className="w-full h-[5%] px-4 flex items-center text-black">
+            {resDB.length > 0 && (
+              <div className="w-fit">
+                Total records: <strong>{resDB.length}</strong>
+              </div>
+            )}
+          </div> */}
+  
+          {/* Data Output Section */}
+          <div className="w-full h-4/6 overflow-auto p-3">
+            <div className="w-full h-full overflow-auto rounded-lg bg-gray-100 scrollbar-custom-sql" ref={dataRef}>
+              {resDB.length > 0 && <Data res={resDB} />}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <Toaster
+      position="top-center"
+      reverseOrder={false}
+      gutter={8}
+      containerClassName=""
+      containerStyle={{}}
+      toastOptions={{
+        className: "",
+        duration: 5000,
+        removeDelay: 1000,
+        style: {
+          background: "green",
+          color: "#fff",
+        },
+        success: {
+          duration: 3000,
+          iconTheme: {
+            primary: "white",
+            secondary: "black",
+          },
+        },
+        error: {
+          duration: 3000,
+          style: {
+            backgroundColor: "red",
+            color: "white",
+          },
+          iconTheme: {
+            primary: "white",
+            secondary: "red",
+          },
+        },
+      }}
+    />
+  </div>
+  
   );
 }
 

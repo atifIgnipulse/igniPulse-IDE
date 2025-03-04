@@ -70,7 +70,7 @@ ${data}
     });
 
     const execPy = (socket, code) => {
-        const pyProcess = spawn("python3", ["-c", code]);
+        const pyProcess = spawn("python", ["-c", code]);
     
         pyProcess.stdout.on("data", (data) => {
             const output = data.toString().trim();
@@ -123,9 +123,12 @@ app.post('/api/createDB', async (req, res) => {
             }
         })
     } else {
-        // console.log(unq_id)
         connection.query(`SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?`, [unq_id], (err, result) => {
-            if (err) {
+            // console.log(result)
+            if (result.length > 0) {
+                res.send(unq_id)
+                
+            } else {
                 const unique_id = crypto.randomUUID();
                 if (!unique_id) {
                     return res.status(400).send("unique id not found");
@@ -139,8 +142,6 @@ app.post('/api/createDB', async (req, res) => {
                         return res.status(200).send(hash)
                     }
                 })
-            } else {
-                res.send(unq_id)
                 
             }
         })

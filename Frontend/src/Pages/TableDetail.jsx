@@ -36,7 +36,7 @@ return (
         ) : (
           <Plus size={18} className="text-[#7FBA00]" />
         )}
-        <p className="text-md text-white tracking-widest font-bold underline">
+        <p className="text-md text-white tracking-widest font-bold">
           {detail.table}
         </p>
       </div>
@@ -46,7 +46,7 @@ return (
         detail.columns.map((col, colIndex) => (
           <div
             key={colIndex}
-            className="w-[90%] flex items-center gap-x-3 pl-6 py-2 border-l-4 border-[#7FBA00] bg-[#253041] text-white text-sm tracking-wide rounded-r-md mt-1"
+            className="w-[90%] flex items-center gap-x-3 pl-6 overflow-auto py-2 border-l-4 border-[#7FBA00] bg-[#253041] text-white text-sm tracking-wide rounded-r-md mt-1 scrollbar-thinnest"
           >
             <span className="font-semibold">{col.column}</span>
             <span className="text-gray-400">{`(${col.type})`}</span>
