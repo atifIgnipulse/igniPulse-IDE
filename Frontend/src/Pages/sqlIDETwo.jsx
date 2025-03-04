@@ -1,15 +1,11 @@
 import { React, useState, useRef, useEffect } from "react";
-import { Database, Eraser, File, Play, Save } from "lucide-react";
-import { io } from "socket.io-client";
+import { Eraser, File, Play, Save } from "lucide-react";
 import CodeMirror from "@uiw/react-codemirror";
 import {EditorView} from "@codemirror/view";
-import { sql } from "@codemirror/lang-sql";
 import Config from "../../Config/config";
 import toast, { Toaster } from "react-hot-toast";
 import Data from "./Data";
 
-import TableLayout from "./TableLayout";
-import DatabaseLayout from "./DatabaseLayout";
 import TableDetail from "./TableDetail";
 
 function sqlIDETwo() {
