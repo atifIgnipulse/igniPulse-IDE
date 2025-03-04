@@ -70,7 +70,7 @@ ${data}
     });
 
     const execPy = (socket, code) => {
-        const pyProcess = spawn("python", ["-c", code]);
+        const pyProcess = spawn("python3", ["-c", code]);
     
         pyProcess.stdout.on("data", (data) => {
             const output = data.toString().trim();
