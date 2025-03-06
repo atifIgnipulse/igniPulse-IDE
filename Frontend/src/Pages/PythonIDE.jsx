@@ -2,7 +2,7 @@ import { React, useState, useRef, useEffect } from "react";
 import { Eraser, File, Play, Save } from "lucide-react";
 import { io } from "socket.io-client";
 import CodeMirror from "@uiw/react-codemirror";
-import {EditorView} from "@codemirror/view";
+import { EditorView } from "@codemirror/view";
 import { python } from "@codemirror/lang-python";
 
 function PythonIDE() {
@@ -93,7 +93,7 @@ function PythonIDE() {
       const handleExitSuccess = () => {
         const exitMsg = document.createElement("p");
         exitMsg.innerText = "--- Program Exited Successfully ---";
-        exitMsg.style.color = "green"; 
+        exitMsg.style.color = "green";
         exitMsg.style.fontWeight = "bold";
         exitMsg.style.marginTop = "10px";
         exitMsg.style.textAlign = "center";
@@ -236,152 +236,186 @@ function PythonIDE() {
     const fileContent = await file.text();
     setEditorContent(fileContent);
   };
-  const handleClear = ()=>{
-    if(editorContent){
-      setEditorContent("")
+  const handleClear = () => {
+    if (editorContent) {
+      setEditorContent("");
       if (editorRef.current) {
         editorRef.current.focus();
       }
     }
-  }
+  };
   const fullHeightEditor = EditorView.theme({
-    ".cm-scroller": { 
-      maxHeight: "90vh !important",  // Fixed height for scrolling
+    ".cm-scroller": {
+      maxHeight: "90vh !important", // Fixed height for scrolling
       overflow: "auto !important", // Ensure scrollbars appear when needed
     },
-    ".cm-content": { 
-      minHeight: "90vh !important",  // Prevents extra height
-      whiteSpace: "pre",  // Prevents text wrapping
+    ".cm-content": {
+      minHeight: "90vh !important", // Prevents extra height
+      whiteSpace: "pre", // Prevents text wrapping
     },
-    ".cm-gutter": { 
-      minHeight: "90vh !important",  // Aligns with `.cm-content`
-      
+    ".cm-gutter": {
+      minHeight: "90vh !important", // Aligns with `.cm-content`
     },
   });
   const customScrollbar = EditorView.theme({
-      ".cm-scroller": { 
-        scrollbarWidth: "thin", // For Firefox
-      },
-      "::-webkit-scrollbar": {
-        width: "8px",  // Scrollbar width
-        height: "8px", // Horizontal scrollbar height
-      },
-      "::-webkit-scrollbar-track": {
-        background: "#1E1E1E", // Track color
-        borderRadius: "5px",
-      },
-      "::-webkit-scrollbar-thumb": {
-        background: "#bb8c00", // Thumb color
-        borderRadius: "5px",
-      },
-      "::-webkit-scrollbar-thumb:hover": {
-        background: "#005BBB", // Thumb hover effect
-      }
-    });
+    ".cm-scroller": {
+      scrollbarWidth: "thin", // For Firefox
+    },
+    "::-webkit-scrollbar": {
+      width: "8px", // Scrollbar width
+      height: "8px", // Horizontal scrollbar height
+    },
+    "::-webkit-scrollbar-track": {
+      background: "#1E1E1E", // Track color
+      borderRadius: "5px",
+    },
+    "::-webkit-scrollbar-thumb": {
+      background: "#bb8c00", // Thumb color
+      borderRadius: "5px",
+    },
+    "::-webkit-scrollbar-thumb:hover": {
+      background: "#005BBB", // Thumb hover effect
+    },
+  });
 
   return (
     <div
-    className="overflow-hidden w-full h-screen flex flex-col items-center justify-start bg-white text-black"
-    onMouseMove={handleMouseMove}
-    onMouseUp={handleMouseUp}
-  >
-    <div className="flex items-center justify-between gap-x-2 lg:px-8 md:px-8 px-1 py-1 h-[8vh] w-full bg-gray-300">
-      <div className="flex items-center justify-between gap-x-2">
-        <button
-          className="cursor-pointer text-xs font-semibold flex items-center gap-x-2 bg-red-600 px-4 py-2 rounded hover:bg-red-700 text-white tracking-wider"
-          onClick={handleClear}
-        >
-          Clear <Eraser size={18} />
-        </button>
-        <button
-          disabled={disable}
-          className="cursor-pointer text-sm bg-green-600 font-semibold px-4 py-2 w-24 rounded hover:bg-green-700 text-white tracking-wide"
-          onClick={handleRun}
-        >
-          {disable ? (
-            <div className="w-full flex justify-center items-center">
-              <div className="border-4 border-t-transparent border-white rounded-full animate-spin size-4"></div>
-            </div>
-          ) : (
-            <div className="flex items-center gap-x-1 text-xs">
-              Execute <Play size={14} />
-            </div>
-          )}
-        </button>
-      </div>
-      <div className="flex items-center gap-x-2">
-        <button
-          className="cursor-pointer text-xs font-semibold flex items-center gap-x-2 bg-blue-500 px-4 py-2 rounded hover:bg-blue-600 text-white tracking-wide"
-          onClick={openFile}
-        >
-          Open Script <File size={18} />
-        </button>
-        <button
-          className="cursor-pointer text-xs font-semibold flex items-center gap-x-2 bg-blue-500 px-4 py-2 rounded hover:bg-blue-600 text-white tracking-wide"
-          onClick={handleDownload}
-        >
-          Save <Save size={18} />
-        </button>
+      className="overflow-hidden w-full h-screen flex flex-col items-center justify-start bg-white text-black"
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+    >
+      <div className="flex items-center justify-between gap-x-2 lg:px-8 md:px-8 px-1 py-1 h-[8vh] w-full bg-gray-300">
+        <div className="flex items-center justify-between gap-x-2">
+          <button
+            className="cursor-pointer text-xs font-semibold flex items-center gap-x-2 bg-red-600 px-4 py-2 rounded hover:bg-red-700 text-white tracking-wider"
+            onClick={handleClear}
+          >
+            Clear <Eraser size={18} />
+          </button>
+          <button
+            disabled={disable}
+            className="cursor-pointer text-sm bg-green-600 font-semibold px-4 py-2 w-24 rounded hover:bg-green-700 text-white tracking-wide"
+            onClick={handleRun}
+          >
+            {disable ? (
+              <div className="w-full flex justify-center items-center">
+                <div className="border-4 border-t-transparent border-white rounded-full animate-spin size-4"></div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-x-1 text-xs">
+                Execute <Play size={14} />
+              </div>
+            )}
+          </button>
+        </div>
+        <div className="flex items-center gap-x-2">
+          <button
+            className="cursor-pointer text-xs font-semibold flex items-center gap-x-2 bg-blue-500 px-4 py-2 rounded hover:bg-blue-600 text-white tracking-wide"
+            onClick={openFile}
+          >
+            Open Script <File size={18} />
+          </button>
+          <button
+            className="cursor-pointer text-xs font-semibold flex items-center gap-x-2 bg-blue-500 px-4 py-2 rounded hover:bg-blue-600 text-white tracking-wide"
+            onClick={handleDownload}
+          >
+            Save <Save size={18} />
+          </button>
+        </div>
       </div>
 
-      
-
-    </div>
-  
-    <div className="flex flex-col lg:flex-row md:flex-row h-full overflow-hidden w-full">
-      <div
-        className="flex items-center justify-center"
-        style={mobile ? { height: `${100 - outputHeight}%`, width: "100%" } : { width: `${100 - outputWidth}%`, height: "100%" }}
-      >
-        {/* <div className="h-full w-full grid place-items-center bg-gray-100">
+      <div className="flex flex-col lg:flex-row md:flex-row h-full overflow-hidden w-full">
+        <div
+          className="flex items-center justify-center"
+          style={
+            mobile
+              ? { height: `${100 - outputHeight}%`, width: "100%" }
+              : { width: `${100 - outputWidth}%`, height: "100%" }
+          }
+        >
+          {/* <div className="h-full w-full grid place-items-center bg-gray-100">
           <div className="w-full h-full overflow-hidden">
             <div className="flex items-center justify-center w-full h-full overflow-auto scrollbar-custom"> */}
-              <CodeMirror
-                value={editorContent}
-                className="w-full text-[1rem] scrollbar-custom border border-gray-300 overflow-hidden"
-                theme="light"
-                extensions={[fullHeightEditor, customScrollbar]}
-                onChange={(newContent) => setEditorContent(newContent)}
-                options={{ lineNumbers: true }}
-                onCreateEditor={(editor) => {
-                  editorRef.current = editor;
-                }}
-              />
-            {/* </div>
+          <CodeMirror
+            value={editorContent}
+            className="w-full text-[1rem] scrollbar-custom border border-gray-300 overflow-hidden"
+            theme="light"
+            extensions={[fullHeightEditor, customScrollbar]}
+            onChange={(newContent) => setEditorContent(newContent)}
+            options={{ lineNumbers: true }}
+            onCreateEditor={(editor) => {
+              editorRef.current = editor;
+            }}
+          />
+          {/* </div>
           </div>
         </div> */}
-      </div>
-      <svg
-        className={`${mobile ? "rotate-90 w-fit" : "h-full bg-gray-300"} cursor-e-resize`}
-        onMouseDown={handleMouseDown}
-        onTouchStart={handleMouseDown}
-        width="15px"
-        height="20px"
-        viewBox="0 0 64 64"
-        fill="#000"
-      >
-        <line fill="none" stroke="#000" strokeWidth="2" x1="24" y1="0" x2="24" y2="64" />
-        <line fill="none" stroke="#000" strokeWidth="2" x1="32" y1="0" x2="32" y2="64" />
-        <line fill="none" stroke="#000" strokeWidth="2" x1="40" y1="0" x2="40" y2="64" />
-      </svg>
-      <div
-        className="relative flex flex-col items-end gap-y-2 bg-gray-100 border-l border-gray-300 "
-        style={mobile ? { height: `${outputHeight}%`, width: "100%" } : { width: `${outputWidth}%`, height: "100%" }}
-      >
-        <h2 className="w-full text-2xl text-center font-semibold tracking-wider bg-gray-200 text-black py-2 ">
-          Output
-        </h2>
-        <button
-          className="w-fit cursor-pointer text-sm bg-red-600 font-semibold flex items-center gap-x-2 px-4 py-2 rounded hover:bg-red-700 text-white tracking-wide"
-          onClick={clearOutput}
+        </div>
+        <svg
+          className={`${
+            mobile ? "rotate-90 w-fit" : "h-full bg-gray-300"
+          } cursor-e-resize`}
+          onMouseDown={handleMouseDown}
+          onTouchStart={handleMouseDown}
+          width="15px"
+          height="20px"
+          viewBox="0 0 64 64"
+          fill="#000"
         >
-          <Eraser size={18} />
-        </button>
-        <div className="w-full h-full leading-snug tracking-widest text-black text-start text-[.9rem] overflow-auto ps-5 scrollbar-custom" id="outputDiv"></div>
+          <line
+            fill="none"
+            stroke="#000"
+            strokeWidth="2"
+            x1="24"
+            y1="0"
+            x2="24"
+            y2="64"
+          />
+          <line
+            fill="none"
+            stroke="#000"
+            strokeWidth="2"
+            x1="32"
+            y1="0"
+            x2="32"
+            y2="64"
+          />
+          <line
+            fill="none"
+            stroke="#000"
+            strokeWidth="2"
+            x1="40"
+            y1="0"
+            x2="40"
+            y2="64"
+          />
+        </svg>
+        <div
+          className="relative flex flex-col items-end gap-y-2 bg-gray-100 border-l border-gray-300 "
+          style={
+            mobile
+              ? { height: `${outputHeight}%`, width: "100%" }
+              : { width: `${outputWidth}%`, height: "100%" }
+          }
+        >
+          <div className="w-full flex items-center justify-between bg-gray-200 px-4">
+            <h2 className="w-full text-xl font-semibold tracking-wider text-black py-2 ">
+              Output
+            </h2>
+            <button
+              className="w-fit cursor-pointer text-sm bg-red-600 font-semibold flex items-center gap-x-2 px-4 py-2 rounded hover:bg-red-700 text-white tracking-wide"
+              onClick={clearOutput}
+            >
+              Clear <Eraser size={18} />
+            </button>
+          </div>
+          <div
+            className="w-full h-full leading-snug tracking-widest text-black text-start text-[.9rem] overflow-auto ps-5 scrollbar-custom"
+            id="outputDiv"
+          ></div>
+        </div>
       </div>
     </div>
-  </div>
-  
   );
 }
 

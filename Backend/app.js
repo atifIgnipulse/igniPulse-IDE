@@ -16,10 +16,10 @@ const crypto = require("crypto");
 const server = http.createServer(app);
 // 2. create io for socket
 const allowedOrigins = [
-    "http://51.24.30.180:8080", 
-    "http://www.igniup.com",   
-    "https://www.igniup.com",  
-    "http://igniup.com",       
+    "http://51.24.30.180:8080",
+    "http://www.igniup.com",
+    "https://www.igniup.com",
+    "http://igniup.com",
     "https://igniup.com"
 ]
 // const allowedOrigins = [
@@ -70,35 +70,49 @@ ${data}
     });
 
     const execPy = (socket, code) => {
-        const pyProcess = spawn("python3", ["-c", code]);
-    
+        const pyProcess = spawn("python3", ["-c", code], {
+            stdio: ["pipe", "pipe", "pipe"],
+        });
+
+        let fullOutput = "";
+        let errorOutput = "";
+
         pyProcess.stdout.on("data", (data) => {
-            const output = data.toString().trim();
-    
-            if (output.endsWith("INPUT_REQUEST")) {
-                const promptMessage = output.replace("INPUT_REQUEST", "");
-                socket.emit("userInput", promptMessage);
-    
-                socket.once("userEntry", (userInput) => {
-                    pyProcess.stdin.write(userInput + "\n");
-                });
-            } else {
-                if (output) {
-                    socket.emit("pyResponse", output);
+            fullOutput += data.toString();
+        });
+
+        pyProcess.stderr.on("data", (data) => {
+            let errorMsg = data.toString();
+
+            // Adjust error line numbers
+            errorMsg = errorMsg.replace(/File "<string>", line (\d+)/g, (match, lineNum) => {
+                const adjustedLine = Math.max(1, lineNum - 7); 
+                return `line ${adjustedLine}`;
+            });
+
+            errorOutput += errorMsg; 
+        });
+
+        pyProcess.on("close", (code) => {
+
+            if(errorOutput.trim() && fullOutput.trim()){
+                socket.emit("pyResponse", fullOutput.trim());
+                socket.emit("pyResponse", "<b>Error!\n</b>" + errorOutput.trim());
+            }else {
+               
+                if (errorOutput.trim()) {
+                    socket.emit("pyResponse", "<b>Error!\n</b>" + errorOutput.trim());
+                } else if (fullOutput.trim()) {
+                    socket.emit("pyResponse", fullOutput.trim());
                 }
             }
+
+            socket.emit("EXIT_SUCCESS", "EXIT_SUCCESS");
         });
-    
-        pyProcess.stderr.on("data", (data) => {
-            socket.emit("pyResponse", "Error: " + data.toString());
-        });
-    
-        pyProcess.on("close", (code) => {
-            console.log("Python process exited with code:", code);
-            socket.emit("EXIT_SUCCESS", "EXIT_SUCCESS"); 
-        });
+
     };
-    
+
+
 
     socket.on("disconnect", () => {
         console.log("disconnected user:", socket.id);
@@ -127,7 +141,7 @@ app.post('/api/createDB', async (req, res) => {
             // console.log(result)
             if (result.length > 0) {
                 res.send(unq_id)
-                
+
             } else {
                 const unique_id = crypto.randomUUID();
                 if (!unique_id) {
@@ -142,7 +156,7 @@ app.post('/api/createDB', async (req, res) => {
                         return res.status(200).send(hash)
                     }
                 })
-                
+
             }
         })
     }
@@ -259,7 +273,7 @@ app.get('/api/getTables', async (req, res) => {
 // })
 
 
-app.get('/api/DDBSES', (req, res)=>{
+app.get('/api/DDBSES', (req, res) => {
     const systemDatabases = ["information_schema", "mysql", "performance_schema", "sys"];
     connection.query("SHOW DATABASES", (err, results) => {
         if (err) {
