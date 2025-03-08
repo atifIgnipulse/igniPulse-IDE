@@ -126,13 +126,15 @@ ${data}
             socket.emit("EXIT_SUCCESS", "EXIT_SUCCESS");
         });
 
+        socket.on("disconnect", () => {
+            console.log("disconnected user:", socket.id);
+            socket.removeListener("userEntry", handleUserEntry);
+            if (!pyProcess.killed) {
+                pyProcess.kill();
+            }
+        });
     };
 
-
-
-    socket.on("disconnect", () => {
-        console.log("disconnected user:", socket.id);
-    });
 });
 
 
