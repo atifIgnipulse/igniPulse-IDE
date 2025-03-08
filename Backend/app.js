@@ -70,16 +70,32 @@ ${data}
     });
 
     const execPy = (socket, code) => {
-        const pyProcess = spawn("python3", ["-c", code], {
+        const pyProcess = spawn("python3", ["-u", "-c", code], {
             stdio: ["pipe", "pipe", "pipe"],
         });
 
         let fullOutput = "";
         let errorOutput = "";
+        let expectingEntry = false;
 
         pyProcess.stdout.on("data", (data) => {
-            fullOutput += data.toString();
+            const outputCheck = data.toString();
+            if(outputCheck.includes("INPUT_REQUEST")){
+                expectingEntry = true
+                socket.emit("userInput", outputCheck.replace("INPUT_REQUEST", "").trim());
+            }else{
+                fullOutput += data.toString();
+            }
         });
+        socket.on("userEntry", (userInput) => {
+            if (expectingEntry) {
+                console.log("Received input from user:", userInput);
+                pyProcess.stdin.write(userInput + "\n"); // Send input to Python
+                expectingEntry = false;
+            }
+        });
+    
+        // pyProcess.stdin.write(code + "\n");
 
         pyProcess.stderr.on("data", (data) => {
             let errorMsg = data.toString();

@@ -101,74 +101,74 @@ function PythonIDE() {
         document.getElementById("outputDiv").appendChild(exitMsg);
       };
 
-      socket.current.on("pyResponse", handlePyResponse);
-      socket.current.on("EXIT_SUCCESS", handleExitSuccess);
+        socket.current.on("pyResponse", handlePyResponse);
+        socket.current.on("EXIT_SUCCESS", handleExitSuccess);
 
-      socket.current.on("userInput", (message) => {
-        setDisable(false);
-        const outputDiv = document.getElementById("outputDiv");
+        socket.current.on("userInput", (message) => {
+          setDisable(false);
+          const outputDiv = document.getElementById("outputDiv");
 
-        // Normalize newlines to ensure consistency
-        let formattedMessage = message.replace(/\r\n|\r|\n/g, "\n");
+          // Normalize newlines to ensure consistency
+          let formattedMessage = message.replace(/\r\n|\r|\n/g, "\n");
 
-        // Extract lines while preserving newlines
-        const lines = formattedMessage
-          .match(/[^\n]*(\n|$)/g)
-          .filter((line) => line !== "");
+          // Extract lines while preserving newlines
+          const lines = formattedMessage
+            .match(/[^\n]*(\n|$)/g)
+            .filter((line) => line !== "");
 
-        // Process all lines except the last one
-        lines.slice(0, -1).forEach((line) => {
-          const lineDiv = document.createElement("div");
-          lineDiv.innerHTML = line.replace(/\n/g, "<br>");
-          lineDiv.style.color = "black";
-          lineDiv.style.marginBottom = "5px";
-          outputDiv.appendChild(lineDiv);
-        });
+          // Process all lines except the last one
+          lines.slice(0, -1).forEach((line) => {
+            const lineDiv = document.createElement("div");
+            lineDiv.innerHTML = line.replace(/\n/g, "<br>");
+            lineDiv.style.color = "black";
+            lineDiv.style.marginBottom = "5px";
+            outputDiv.appendChild(lineDiv);
+          });
 
-        // Create a container for the input prompt
-        const inputPromptDiv = document.createElement("div");
-        inputPromptDiv.id = "inputPromptDiv";
-        inputPromptDiv.style.marginTop = "0px";
-        inputPromptDiv.style.display = "flex";
-        inputPromptDiv.style.alignItems = "center";
-        inputPromptDiv.style.justifyContent = "start";
+          // Create a container for the input prompt
+          const inputPromptDiv = document.createElement("div");
+          inputPromptDiv.id = "inputPromptDiv";
+          inputPromptDiv.style.marginTop = "0px";
+          inputPromptDiv.style.display = "flex";
+          inputPromptDiv.style.alignItems = "center";
+          inputPromptDiv.style.justifyContent = "start";
 
-        // Create a label for the last line
-        const promptLabel = document.createElement("label");
-        promptLabel.innerHTML = lines[lines.length - 1].replace(/\n/g, "<br>");
-        promptLabel.style.marginRight = "10px";
-        promptLabel.style.color = "black";
+          // Create a label for the last line
+          const promptLabel = document.createElement("label");
+          promptLabel.innerHTML = lines[lines.length - 1].replace(/\n/g, "<br>");
+          promptLabel.style.marginRight = "10px";
+          promptLabel.style.color = "black";
 
-        // Create the input box
-        const inputBox = document.createElement("input");
-        inputBox.type = "text";
-        inputBox.id = "dynamicInput";
-        inputBox.style.padding = "0px";
-        inputBox.style.outline = "none";
-        inputBox.style.backgroundColor = "inherit";
-        inputBox.style.color = "black";
+          // Create the input box
+          const inputBox = document.createElement("input");
+          inputBox.type = "text";
+          inputBox.id = "dynamicInput";
+          inputBox.style.padding = "0px";
+          inputBox.style.outline = "none";
+          inputBox.style.backgroundColor = "inherit";
+          inputBox.style.color = "black";
 
-        // Append label and input box to inputPromptDiv
-        inputPromptDiv.appendChild(promptLabel);
-        inputPromptDiv.appendChild(inputBox);
+          // Append label and input box to inputPromptDiv
+          inputPromptDiv.appendChild(promptLabel);
+          inputPromptDiv.appendChild(inputBox);
 
-        // Append inputPromptDiv to the outputDiv
-        outputDiv.appendChild(inputPromptDiv);
+          // Append inputPromptDiv to the outputDiv
+          outputDiv.appendChild(inputPromptDiv);
 
-        // Focus on the input box
-        inputBox.focus();
+          // Focus on the input box
+          inputBox.focus();
 
-        // Handle Enter key event
-        inputBox.addEventListener("keydown", (event) => {
-          if (event.key === "Enter") {
-            const userInput = inputBox.value.trim();
-            if (userInput) {
-              socket.current.emit("userEntry", userInput);
-              inputBox.disabled = true;
+          // Handle Enter key event
+          inputBox.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+              const userInput = inputBox.value.trim();
+              if (userInput) {
+                socket.current.emit("userEntry", userInput);
+                inputBox.disabled = true;
+              }
             }
-          }
+          });
         });
-      });
     }
 
     return () => {
