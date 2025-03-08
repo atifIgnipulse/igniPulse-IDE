@@ -78,44 +78,43 @@ ${data}
         let errorOutput = "";
         let expectingEntry = false;
 
+        // Handle Python stdout
         pyProcess.stdout.on("data", (data) => {
             const outputCheck = data.toString();
-            if(outputCheck.includes("INPUT_REQUEST")){
-                expectingEntry = true
+            if (outputCheck.includes("INPUT_REQUEST")) {
+                expectingEntry = true;
                 socket.emit("userInput", outputCheck.replace("INPUT_REQUEST", "").trim());
-            }else{
+            } else {
                 fullOutput += data.toString();
             }
         });
-        socket.on("userEntry", (userInput) => {
+
+        // Handle user input
+        const handleUserEntry = (userInput) => {
             if (expectingEntry) {
                 console.log("Received input from user:", userInput);
                 pyProcess.stdin.write(userInput + "\n"); // Send input to Python
                 expectingEntry = false;
             }
-        });
-    
-        // pyProcess.stdin.write(code + "\n");
+        };
+        socket.on("userEntry", handleUserEntry);
 
+        // Handle Python stderr
         pyProcess.stderr.on("data", (data) => {
             let errorMsg = data.toString();
-
-            // Adjust error line numbers
             errorMsg = errorMsg.replace(/File "<string>", line (\d+)/g, (match, lineNum) => {
-                const adjustedLine = Math.max(1, lineNum - 7); 
+                const adjustedLine = Math.max(1, lineNum - 7);
                 return `line ${adjustedLine}`;
             });
-
-            errorOutput += errorMsg; 
+            errorOutput += errorMsg;
         });
 
+        // Handle process exit
         pyProcess.on("close", (code) => {
-
-            if(errorOutput.trim() && fullOutput.trim()){
+            if (errorOutput.trim() && fullOutput.trim()) {
                 socket.emit("pyResponse", fullOutput.trim());
                 socket.emit("pyResponse", "<b>Error!\n</b>" + errorOutput.trim());
-            }else {
-               
+            } else {
                 if (errorOutput.trim()) {
                     socket.emit("pyResponse", "<b>Error!\n</b>" + errorOutput.trim());
                 } else if (fullOutput.trim()) {
@@ -126,16 +125,21 @@ ${data}
             socket.emit("EXIT_SUCCESS", "EXIT_SUCCESS");
         });
 
+        // Cleanup when user disconnects
         socket.on("disconnect", () => {
             console.log("disconnected user:", socket.id);
+
+            // Remove user entry listener
             socket.removeListener("userEntry", handleUserEntry);
+
+            // Kill the Python process if still running
             if (!pyProcess.killed) {
                 pyProcess.kill();
             }
         });
     };
-
 });
+
 
 
 app.post('/api/createDB', async (req, res) => {
