@@ -10,13 +10,13 @@ function LeftMenu({handleCopy, handlePaste}) {
           <div className="flex items-center justify-center p-3.5 flex-col gap-x-2 transition-all duration-300 bg-[#2E60EB] hover:bg-[#3d6df1] rounded-full ">
             <Copy onClick={handleCopy} className="text-white" size={16} />
           </div>
-          <p className="text-black text-xs font-semibold select-none">Copy</p>
+          <p className="text-black text-sm font-thin select-none">Copy</p>
         </div>
         <div className="h-[16%] w-[80%] flex flex-col items-center justify-center gap-y-1 cursor-pointer">
           <div className="flex items-center justify-center p-3.5 flex-col gap-x-2 transition-all duration-300 bg-[#2E60EB] hover:bg-[#3d6df1] rounded-full ">
             <ClipboardCheck onClick={handlePaste} className="text-white" size={18} />
           </div>
-          <p className="text-black text-xs font-semibold select-none">Paste</p>
+          <p className="text-black text-sm font-thin select-none">Paste</p>
         </div>
       </div>
       <div className="h-[20%] w-full flex items-end justify-center py-3 ">

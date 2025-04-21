@@ -6,7 +6,7 @@ function Button({ text, icon, action, classNames }) {
       className={classNames}
       onClick={action}
     >
-      <p className="text-xs">{text}</p>
+      <p className="text-sm font-thin">{text}</p>
       {icon}
     </button>
   );
