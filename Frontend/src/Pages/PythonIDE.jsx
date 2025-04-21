@@ -1,59 +1,35 @@
 import { React, useState, useRef, useEffect } from "react";
-import { Eraser, File, Play, Save } from "lucide-react";
+import {
+  CirclePlay,
+  ClipboardCheck,
+  Copy,
+  Download,
+  Eraser,
+  File,
+  FileCode2,
+  Moon,
+  Play,
+  Rocket,
+  Save,
+} from "lucide-react";
 import { io } from "socket.io-client";
 import CodeMirror from "@uiw/react-codemirror";
-import { EditorView } from "@codemirror/view";
+import { EditorView, highlightActiveLineGutter } from "@codemirror/view";
 import { python } from "@codemirror/lang-python";
+
+import py from "../assets/py.svg";
+import LeftMenu from "../components/LeftMenu";
+import NavBar from "../components/NavBar";
+import Button from "../components/Button";
+import SuccessAni from "../components/SuccessAni";
+import ErrorAni from "../components/ErrorAni";
 
 function PythonIDE() {
   const editorRef = useRef(null);
-
-  const [outputWidth, setOutputWidth] = useState(30);
-  const [outputHeight, setOutputHeight] = useState(20);
-  const [isDragging, setIsDragging] = useState(false);
-  const [mobile, setMobile] = useState(false);
+  const [tickerSuccess, setTickerSuccess] = useState({flag: false, message: ""});
+  const [tickerError, setTickerError] = useState({flag: false, message: ""});
+  const [editorContent, setEditorContent] = useState("");
   const [disable, setDisable] = useState(false);
-  const [editorContent, setEditorContent] = useState(""); // Editor content state
-
-  const handleMouseDown = (e) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleMouseMoveHorizontal = (e) => {
-    if (isDragging) {
-      const newWidth =
-        ((window.innerWidth - e.clientX) / window.innerWidth) * 100;
-      if (newWidth > 30 && newWidth < 80) {
-        // Set limits for resizing
-        setOutputWidth(newWidth);
-      }
-    }
-  };
-  const handleMouseMoveVertical = (e) => {
-    if (isDragging) {
-      const newHeight =
-        ((window.innerHeight - e.clientY) / window.innerHeight) * 100;
-      if (newHeight > 10 && newHeight < 80) {
-        // Set limits for resizing
-        setOutputHeight(newHeight);
-      }
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  const handleMouseMove = (e) => {
-    if (window.innerWidth >= 1024) {
-      setMobile(false);
-      handleMouseMoveHorizontal(e);
-    } else {
-      setMobile(true);
-      handleMouseMoveVertical(e);
-    }
-  };
 
   const clearOutput = () => {
     document.getElementById("outputDiv").innerText = "";
@@ -63,12 +39,12 @@ function PythonIDE() {
 
   useEffect(() => {
     if (!socket.current) {
-      socket.current = io("https://igniup.com", {
-        path: "/socket.io/",
-        transports: ["websocket", "polling"],
-        withCredentials: true
-      });
-      // socket.current = io("http://localhost:9000");
+      // socket.current = io("https://igniup.com", {
+      //   path: "/socket.io/",
+      //   transports: ["websocket", "polling"],
+      //   withCredentials: true
+      // });
+      socket.current = io("http://localhost:9000");
 
       const handlePyResponse = (message) => {
         setDisable(false);
@@ -93,82 +69,82 @@ function PythonIDE() {
       const handleExitSuccess = () => {
         const exitMsg = document.createElement("p");
         exitMsg.innerText = "--- Program Exited Successfully ---";
-        exitMsg.style.color = "green";
+        exitMsg.style.color = "black";
         exitMsg.style.fontWeight = "bold";
         exitMsg.style.marginTop = "10px";
-        exitMsg.style.textAlign = "center";
+        exitMsg.style.textAlign = "start";
 
         document.getElementById("outputDiv").appendChild(exitMsg);
       };
 
-        socket.current.on("pyResponse", handlePyResponse);
-        socket.current.on("EXIT_SUCCESS", handleExitSuccess);
+      socket.current.on("pyResponse", handlePyResponse);
+      socket.current.on("EXIT_SUCCESS", handleExitSuccess);
 
-        socket.current.on("userInput", (message) => {
-          setDisable(false);
-          const outputDiv = document.getElementById("outputDiv");
+      socket.current.on("userInput", (message) => {
+        setDisable(false);
+        const outputDiv = document.getElementById("outputDiv");
 
-          // Normalize newlines to ensure consistency
-          let formattedMessage = message.replace(/\r\n|\r|\n/g, "\n");
+        // Normalize newlines to ensure consistency
+        let formattedMessage = message.replace(/\r\n|\r|\n/g, "\n");
 
-          // Extract lines while preserving newlines
-          const lines = formattedMessage
-            .match(/[^\n]*(\n|$)/g)
-            .filter((line) => line !== "");
+        // Extract lines while preserving newlines
+        const lines = formattedMessage
+          .match(/[^\n]*(\n|$)/g)
+          .filter((line) => line !== "");
 
-          // Process all lines except the last one
-          lines.slice(0, -1).forEach((line) => {
-            const lineDiv = document.createElement("div");
-            lineDiv.innerHTML = line.replace(/\n/g, "<br>");
-            lineDiv.style.color = "black";
-            lineDiv.style.marginBottom = "5px";
-            outputDiv.appendChild(lineDiv);
-          });
-
-          // Create a container for the input prompt
-          const inputPromptDiv = document.createElement("div");
-          inputPromptDiv.id = "inputPromptDiv";
-          inputPromptDiv.style.marginTop = "0px";
-          inputPromptDiv.style.display = "flex";
-          inputPromptDiv.style.alignItems = "center";
-          inputPromptDiv.style.justifyContent = "start";
-
-          // Create a label for the last line
-          const promptLabel = document.createElement("label");
-          promptLabel.innerHTML = lines[lines.length - 1].replace(/\n/g, "<br>");
-          promptLabel.style.marginRight = "10px";
-          promptLabel.style.color = "black";
-
-          // Create the input box
-          const inputBox = document.createElement("input");
-          inputBox.type = "text";
-          inputBox.id = "dynamicInput";
-          inputBox.style.padding = "0px";
-          inputBox.style.outline = "none";
-          inputBox.style.backgroundColor = "inherit";
-          inputBox.style.color = "black";
-
-          // Append label and input box to inputPromptDiv
-          inputPromptDiv.appendChild(promptLabel);
-          inputPromptDiv.appendChild(inputBox);
-
-          // Append inputPromptDiv to the outputDiv
-          outputDiv.appendChild(inputPromptDiv);
-
-          // Focus on the input box
-          inputBox.focus();
-
-          // Handle Enter key event
-          inputBox.addEventListener("keydown", (event) => {
-            if (event.key === "Enter") {
-              const userInput = inputBox.value.trim();
-              if (userInput) {
-                socket.current.emit("userEntry", userInput);
-                inputBox.disabled = true;
-              }
-            }
-          });
+        // Process all lines except the last one
+        lines.slice(0, -1).forEach((line) => {
+          const lineDiv = document.createElement("div");
+          lineDiv.innerHTML = line.replace(/\n/g, "<br>");
+          lineDiv.style.color = "black";
+          lineDiv.style.marginBottom = "5px";
+          outputDiv.appendChild(lineDiv);
         });
+
+        // Create a container for the input prompt
+        const inputPromptDiv = document.createElement("div");
+        inputPromptDiv.id = "inputPromptDiv";
+        inputPromptDiv.style.marginTop = "0px";
+        inputPromptDiv.style.display = "flex";
+        inputPromptDiv.style.alignItems = "center";
+        inputPromptDiv.style.justifyContent = "start";
+
+        // Create a label for the last line
+        const promptLabel = document.createElement("label");
+        promptLabel.innerHTML = lines[lines.length - 1].replace(/\n/g, "<br>");
+        promptLabel.style.marginRight = "10px";
+        promptLabel.style.color = "black";
+
+        // Create the input box
+        const inputBox = document.createElement("input");
+        inputBox.type = "text";
+        inputBox.id = "dynamicInput";
+        inputBox.style.padding = "0px";
+        inputBox.style.outline = "none";
+        inputBox.style.backgroundColor = "inherit";
+        inputBox.style.color = "black";
+
+        // Append label and input box to inputPromptDiv
+        inputPromptDiv.appendChild(promptLabel);
+        inputPromptDiv.appendChild(inputBox);
+
+        // Append inputPromptDiv to the outputDiv
+        outputDiv.appendChild(inputPromptDiv);
+
+        // Focus on the input box
+        inputBox.focus();
+
+        // Handle Enter key event
+        inputBox.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            const userInput = inputBox.value.trim();
+            if (userInput) {
+              socket.current.emit("userEntry", userInput);
+              inputBox.disabled = true;
+            }
+          }
+        });
+      });
     }
 
     return () => {
@@ -219,6 +195,45 @@ function PythonIDE() {
       document.body.removeChild(element);
     }
   };
+  const handleCopy = async () => {
+    if (editorContent.trim()) {
+      try {
+        await navigator.clipboard.writeText(editorContent);
+        setTickerSuccess({flag: true, message: "Copied to clipboard"});
+        console.log("Copied to clipboard");
+        setTimeout(() => {
+          setTickerSuccess({flag: false, message: ""});
+        }, 1700);
+      } catch (err) {
+        setTickerError({flag: true, message: "Failed to copy"});
+        console.error("Failed to copy:", err);
+        setTimeout(() => {
+          setTickerError({flag: false, message: ""});
+        }, 1700);
+      }
+    }
+  };
+  const handlePaste = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text) {
+        setEditorContent((prev) => prev + text); // Appends to existing content
+        if (editorRef.current) {
+          editorRef.current.focus();
+          setTickerSuccess({flag: true, message: "Pasted from clipboard"});
+          setTimeout(() => {
+            setTickerSuccess({flag: false, message: ""});
+          }, 1700);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to paste:", err);
+      setTickerError({flag: true, message: "Failed to paste"});
+      setTimeout(() => {
+        setTickerError({flag: false, message: ""});
+      }, 1700);
+    }
+  };
 
   const openFile = async () => {
     const [fileHandle] = await window.showOpenFilePicker({
@@ -246,17 +261,32 @@ function PythonIDE() {
   };
   const fullHeightEditor = EditorView.theme({
     ".cm-scroller": {
-      maxHeight: "90vh !important", // Fixed height for scrolling
-      overflow: "auto !important", // Ensure scrollbars appear when needed
+      maxHeight: "440px !important",
+      overflow: "auto !important",
     },
     ".cm-content": {
-      minHeight: "90vh !important", // Prevents extra height
-      whiteSpace: "pre", // Prevents text wrapping
+      minHeight: "440px !important",
+      whiteSpace: "pre",
     },
     ".cm-gutter": {
-      minHeight: "90vh !important", // Aligns with `.cm-content`
+      minHeight: "440px !important",
+    },
+    ".cm-gutters": {
+      backgroundColor: "#F1F5F9", // Light background
+      color: "#64748B", // Slate text
+      borderRight: "1px solid #E5E7EB",
+    },
+    ".cm-lineNumbers": {
+      fontSize: "0.875rem",
+      fontFamily: "monospace",
+    },
+    ".cm-activeLineGutter": {
+      backgroundColor: "#3B82F6", // Tailwind blue-500
+      color: "white !important",
+      padding: "2px 0px",
     },
   });
+
   const customScrollbar = EditorView.theme({
     ".cm-scroller": {
       scrollbarWidth: "thin", // For Firefox
@@ -266,156 +296,116 @@ function PythonIDE() {
       height: "8px", // Horizontal scrollbar height
     },
     "::-webkit-scrollbar-track": {
-      background: "#1E1E1E", // Track color
+      background: "#F3F4F6", // Track color
       borderRadius: "5px",
     },
     "::-webkit-scrollbar-thumb": {
-      background: "#bb8c00", // Thumb color
+      background: "#F3F4F6", // Thumb color
       borderRadius: "5px",
     },
     "::-webkit-scrollbar-thumb:hover": {
-      background: "#005BBB", // Thumb hover effect
+      background: "#F3F4F6", // Thumb hover effect
     },
   });
 
-  return (
-    <div
-      className="overflow-hidden w-full h-screen flex flex-col items-center justify-start bg-white text-black"
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-    >
-      <div className="flex items-center justify-between gap-x-2 lg:px-8 md:px-8 px-1 py-1 h-[8vh] w-full bg-gray-300">
-        <div className="flex items-center justify-between gap-x-2">
-          <button
-            className="cursor-pointer text-xs font-semibold flex items-center gap-x-2 bg-red-600 px-4 py-2 rounded hover:bg-red-700 text-white tracking-wider"
-            onClick={handleClear}
-          >
-            Clear <Eraser size={18} />
-          </button>
-          <button
-            disabled={disable}
-            className="cursor-pointer text-sm bg-green-600 font-semibold px-4 py-2 w-24 rounded hover:bg-green-700 text-white tracking-wide"
-            onClick={handleRun}
-          >
-            {disable ? (
-              <div className="w-full flex justify-center items-center">
-                <div className="border-4 border-t-transparent border-white rounded-full animate-spin size-4"></div>
-              </div>
-            ) : (
-              <div className="flex items-center gap-x-1 text-xs">
-                Execute <Play size={14} />
-              </div>
-            )}
-          </button>
-        </div>
-        <div className="flex items-center gap-x-2">
-          <button
-            className="cursor-pointer text-xs font-semibold flex items-center gap-x-2 bg-blue-500 px-4 py-2 rounded hover:bg-blue-600 text-white tracking-wide"
-            onClick={openFile}
-          >
-            Open Script <File size={18} />
-          </button>
-          <button
-            className="cursor-pointer text-xs font-semibold flex items-center gap-x-2 bg-blue-500 px-4 py-2 rounded hover:bg-blue-600 text-white tracking-wide"
-            onClick={handleDownload}
-          >
-            Save <Save size={18} />
-          </button>
-        </div>
-      </div>
+  const editorBtns = [
+    {
+      text: "Clear",
+      icon: <Eraser className="text-white" size={14} />,
+      action: handleClear,
+    },
+    {
+      text: "Execute",
+      icon: <CirclePlay className="text-white" size={14} />,
+      action: handleRun,
+    },
+  ];
 
-      <div className="flex flex-col lg:flex-row md:flex-row h-full overflow-hidden w-full">
-        <div
-          className="flex items-center justify-center"
-          style={
-            mobile
-              ? { height: `${100 - outputHeight}%`, width: "100%" }
-              : { width: `${100 - outputWidth}%`, height: "100%" }
-          }
-        >
-          {/* <div className="h-full w-full grid place-items-center bg-gray-100">
-          <div className="w-full h-full overflow-hidden">
-            <div className="flex items-center justify-center w-full h-full overflow-auto scrollbar-custom"> */}
-          <CodeMirror
-            value={editorContent}
-            className="w-full text-[1rem] scrollbar-custom border border-gray-300 overflow-hidden"
-            theme="light"
-            extensions={[fullHeightEditor, customScrollbar]}
-            onChange={(newContent) => setEditorContent(newContent)}
-            options={{ lineNumbers: true }}
-            onCreateEditor={(editor) => {
-              editorRef.current = editor;
-            }}
-          />
-          {/* </div>
-          </div>
-        </div> */}
+  return (
+    <>
+      <div className="flex flex-col h-screen w-screen overflow-hidden relative">
+        <div className="w-full h-22 text-center p-2"> 
+          <div className=" h-full w-full"></div>  
         </div>
-        <svg
-          className={`${
-            mobile ? "rotate-90 w-fit" : "h-full bg-gray-300"
-          } cursor-e-resize`}
-          onMouseDown={handleMouseDown}
-          onTouchStart={handleMouseDown}
-          width="15px"
-          height="20px"
-          viewBox="0 0 64 64"
-          fill="#000"
-        >
-          <line
-            fill="none"
-            stroke="#000"
-            strokeWidth="2"
-            x1="24"
-            y1="0"
-            x2="24"
-            y2="64"
-          />
-          <line
-            fill="none"
-            stroke="#000"
-            strokeWidth="2"
-            x1="32"
-            y1="0"
-            x2="32"
-            y2="64"
-          />
-          <line
-            fill="none"
-            stroke="#000"
-            strokeWidth="2"
-            x1="40"
-            y1="0"
-            x2="40"
-            y2="64"
-          />
-        </svg>
-        <div
-          className="relative flex flex-col items-end gap-y-2 bg-gray-100 border-l border-gray-300 "
-          style={
-            mobile
-              ? { height: `${outputHeight}%`, width: "100%" }
-              : { width: `${outputWidth}%`, height: "100%" }
-          }
-        >
-          <div className="w-full flex items-center justify-between bg-gray-200 px-4">
-            <h2 className="w-full text-xl font-semibold tracking-wider text-black py-2 ">
-              Output
-            </h2>
-            <button
-              className="w-fit cursor-pointer text-sm bg-red-600 font-semibold flex items-center gap-x-2 px-4 py-2 rounded hover:bg-red-700 text-white tracking-wide"
-              onClick={clearOutput}
-            >
-              Clear <Eraser size={18} />
-            </button>
+        <div className="flex flex-row items-center justify-center h-full w-full overflow-hidden">
+          <div className="h-full w-30 text-center p-2"> 
+          <div className=" h-full w-full"></div>  
           </div>
-          <div
-            className="w-full h-full leading-snug tracking-widest text-black text-start text-[.9rem] overflow-auto ps-5 scrollbar-custom"
-            id="outputDiv"
-          ></div>
+          <div className="w-full h-full gap-y-2 flex flex-col justify-between">
+            <NavBar handleDownload={handleDownload} openFile={openFile} />
+            <div className="bg-gray-100 h-full w-full flex items-center justify-center gap-x-2 p-2 rounded-xl">
+              <LeftMenu handleCopy={handleCopy} handlePaste={handlePaste} />
+              <div className="border-2 border-sky-700 w-[55%] h-full rounded-lg flex flex-col items-center justify-center p-2 gap-y-1">
+                <div className="w-full h-12 flex items-center justify-between gap-x-2 rounded-lg bg-gray-200 px-2">
+                  <div className="flex items-center justify-center gap-x-1 px-2">
+                    <img src={py} alt="python" className="w-8 h-8" />
+                    <p className="font-black">Python</p>
+                  </div>
+                  <div className="flex items-center justify-center gap-x-2">
+                    {editorBtns.map((btn, index) => (
+                      <Button
+                        classNames={`cursor-pointer flex items-center justify-center gap-x-2 py-2.5 text-white font-semibold ${
+                          btn.text === "Execute"
+                            ? "bg-[#10B335]"
+                            : "bg-[#F7665D]"
+                        } px-4 ${
+                          btn.text === "Execute"
+                            ? "hover:bg-green-600"
+                            : "hover:bg-[#f7766d]"
+                        } rounded-lg`}
+                        action={btn.action}
+                        text={btn.text}
+                        icon={btn.icon}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div className="h-[450px] w-full flex items-start justify-center overflow-auto rounded-lg">
+                  <CodeMirror
+                    value={editorContent}
+                    className="w-[650px] text-[1rem] scrollbar-custom  overflow-hidden"
+                    theme="light"
+                    extensions={[
+                      fullHeightEditor,
+                      customScrollbar,
+                      highlightActiveLineGutter(),
+                    ]}
+                    onChange={(newContent) => setEditorContent(newContent)}
+                    options={{ lineNumbers: true }}
+                    onCreateEditor={(editor) => {
+                      editorRef.current = editor;
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="border-2 border-sky-700 w-[45%] h-full rounded-lg p-2 flex flex-col gap-y-1">
+                <div
+                  className="h-12 w-full flex items-center justify-between gap-x-2 rounded-lg bg-gray-200 px-2"
+                  onClick={clearOutput}
+                >
+                  <p className="font-black px-1">Output</p>
+                  <Button
+                    classNames={`cursor-pointer flex items-center justiy-center gap-x-2 py-2.5 text-white font-semibold bg-[#F7665D] px-4 hover:bg-[#f7766d] rounded-lg text-xs`}
+                    text={editorBtns[0].text}
+                    icon={editorBtns[0].icon}
+                  />
+                </div>
+                <div
+                  id="outputDiv"
+                  className="h-[450px] w-full overflow-auto"
+                ></div>
+              </div>
+            </div>
+          </div>
+          <div className="h-full w-30 text-center p-2"> 
+          <div className=" h-full w-full"></div> </div>
         </div>
+        <div className="w-full h-22 text-center p-2"> 
+        <div className=" h-full w-full"></div> </div>
+        {tickerSuccess.flag && <SuccessAni message={tickerSuccess.message}  />}
+        {tickerError.flag && <ErrorAni message={tickerError.message} />}
       </div>
-    </div>
+    </>
   );
 }
 

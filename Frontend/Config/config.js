@@ -1,15 +1,15 @@
 import axios from "axios";
 
-const BASE_URL = "https://igniup.com/api";
-// const BASE_URL = "http://localhost:9000/api";
+// const BASE_URL = "https://igniup.com/api";
+const BASE_URL = "http://localhost:9000/api";
 
 const ENDPOINTS = {
-    create_db : `${BASE_URL}/createDB`,
-    delete_db : `${BASE_URL}/DDBSES`,
-    post_data : `${BASE_URL}/postData`,
-    get_data : `${BASE_URL}/getDataBases`,
-    get_tables: `${BASE_URL}/getTables`,
-    switch_db: `${BASE_URL}/switchDB`
+    create_db : `${BASE_URL}/sql/createDB`,
+    delete_db : `${BASE_URL}/sql/DDBSES`,
+    post_data : `${BASE_URL}/sql/postData`,
+    get_data : `${BASE_URL}/sql/getDataBases`,
+    get_tables: `${BASE_URL}/sql/getTables`,
+    switch_db: `${BASE_URL}/sql/switchDB`
 }
 
 const createDB = async (id)=>{
