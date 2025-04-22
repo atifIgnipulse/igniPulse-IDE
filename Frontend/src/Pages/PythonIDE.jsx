@@ -21,13 +21,15 @@ import py from "../assets/py.svg";
 import LeftMenu from "../components/LeftMenu";
 import NavBar from "../components/NavBar";
 import Button from "../components/Button";
-import SuccessAni from "../components/SuccessAni";
-import ErrorAni from "../components/ErrorAni";
 
 function PythonIDE() {
   const editorRef = useRef(null);
-  const [tickerSuccess, setTickerSuccess] = useState({flag: false, message: ""});
-  const [tickerError, setTickerError] = useState({flag: false, message: ""});
+  const [tickerSuccess, setTickerSuccess] = useState({
+    flag: false,
+    message: "",
+  });
+  const [copyDone, setCopyDone] = useState(false);
+  const [pasteDone, setPasteDone] = useState(false);
   const [editorContent, setEditorContent] = useState("");
   const [disable, setDisable] = useState(false);
 
@@ -199,17 +201,15 @@ function PythonIDE() {
     if (editorContent.trim()) {
       try {
         await navigator.clipboard.writeText(editorContent);
-        setTickerSuccess({flag: true, message: "Copied to clipboard"});
+        setCopyDone(true);
         console.log("Copied to clipboard");
         setTimeout(() => {
-          setTickerSuccess({flag: false, message: ""});
-        }, 1700);
+            setCopyDone(false);
+        }, 1000);
       } catch (err) {
-        setTickerError({flag: true, message: "Failed to copy"});
+        
         console.error("Failed to copy:", err);
-        setTimeout(() => {
-          setTickerError({flag: false, message: ""});
-        }, 1700);
+        
       }
     }
   };
@@ -220,18 +220,14 @@ function PythonIDE() {
         setEditorContent((prev) => prev + text); // Appends to existing content
         if (editorRef.current) {
           editorRef.current.focus();
-          setTickerSuccess({flag: true, message: "Pasted from clipboard"});
+          setPasteDone(true);
           setTimeout(() => {
-            setTickerSuccess({flag: false, message: ""});
-          }, 1700);
+            setPasteDone(false);
+          }, 1000);
         }
       }
     } catch (err) {
       console.error("Failed to paste:", err);
-      setTickerError({flag: true, message: "Failed to paste"});
-      setTimeout(() => {
-        setTickerError({flag: false, message: ""});
-      }, 1700);
     }
   };
 
@@ -324,17 +320,17 @@ function PythonIDE() {
   return (
     <>
       <div className="flex flex-col h-screen w-screen overflow-hidden relative">
-        <div className="w-full h-22 text-center p-2"> 
-          <div className=" h-full w-full"></div>  
+        <div className="w-full h-22 text-center p-2">
+          <div className=" h-full w-full"></div>
         </div>
         <div className="flex flex-row items-center justify-center h-full w-full overflow-hidden">
-          <div className="h-full w-30 text-center p-2"> 
-          <div className=" h-full w-full"></div>  
+          <div className="h-full w-30 text-center p-2">
+            <div className=" h-full w-full"></div>
           </div>
           <div className="w-full h-full gap-y-2 flex flex-col justify-between">
             <NavBar handleDownload={handleDownload} openFile={openFile} />
             <div className="bg-gray-100 h-full w-full flex items-center justify-center gap-x-2 p-2 rounded-xl">
-              <LeftMenu handleCopy={handleCopy} handlePaste={handlePaste} />
+              <LeftMenu handleCopy={handleCopy} handlePaste={handlePaste} copyDone={copyDone} pasteDone={pasteDone}/>
               <div className="border-2 border-sky-700 w-[55%] h-full rounded-lg flex flex-col items-center justify-center p-2 gap-y-1">
                 <div className="w-full h-12 flex items-center justify-between gap-x-2 rounded-lg bg-gray-200 px-2">
                   <div className="flex items-center justify-center gap-x-1 px-2">
@@ -397,13 +393,13 @@ function PythonIDE() {
               </div>
             </div>
           </div>
-          <div className="h-full w-30 text-center p-2"> 
-          <div className=" h-full w-full"></div> </div>
+          <div className="h-full w-30 text-center p-2">
+            <div className=" h-full w-full"></div>{" "}
+          </div>
         </div>
-        <div className="w-full h-22 text-center p-2"> 
-        <div className=" h-full w-full"></div> </div>
-        {tickerSuccess.flag && <SuccessAni message={tickerSuccess.message}  />}
-        {tickerError.flag && <ErrorAni message={tickerError.message} />}
+        <div className="w-full h-22 text-center p-2">
+          <div className=" h-full w-full"></div>{" "}
+        </div>
       </div>
     </>
   );

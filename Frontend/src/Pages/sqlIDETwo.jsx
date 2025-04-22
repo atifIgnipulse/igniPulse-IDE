@@ -1,12 +1,17 @@
 import { React, useState, useRef, useEffect } from "react";
-import { Eraser, File, Play, Save } from "lucide-react";
+import { CirclePlay, Eraser, File, Play, Save } from "lucide-react";
 import CodeMirror from "@uiw/react-codemirror";
-import {EditorView} from "@codemirror/view";
+import { EditorView, highlightActiveLineGutter } from "@codemirror/view";
 import Config from "../../Config/config";
 import toast, { Toaster } from "react-hot-toast";
 import Data from "./Data";
+import sql from "../assets/sql.svg";
 
 import TableDetail from "./TableDetail";
+import LeftMenu from "../components/LeftMenu";
+import NavBar from "../components/NavBar";
+import Button from "../components/Button";
+import {Info, X} from "lucide-react";
 
 function sqlIDETwo() {
   const dataRef = useRef(null);
@@ -17,44 +22,59 @@ function sqlIDETwo() {
     () => window.localStorage.getItem("unique_id") || ""
   );
   const [details, setDetails] = useState([]);
+  const [copyDone, setCopyDone] = useState(false);
+  const [pasteDone, setPasteDone] = useState(false);
 
+  const [showInfo, setShowInfo] = useState(false);
+
+  const fullHeightEditor = EditorView.theme({
+    ".cm-scroller": {
+      maxHeight: "200px !important",
+      overflow: "auto !important",
+    },
+    ".cm-content": {
+      minHeight: "200px !important",
+      whiteSpace: "pre",
+    },
+    ".cm-gutter": {
+      minHeight: "200px !important",
+    },
+    ".cm-gutters": {
+      backgroundColor: "#F1F5F9", // Light background
+      color: "#64748B", // Slate text
+      borderRight: "1px solid #E5E7EB",
+    },
+    ".cm-lineNumbers": {
+      fontSize: "0.875rem",
+      fontFamily: "monospace",
+    },
+    ".cm-activeLineGutter": {
+      backgroundColor: "#3B82F6", // Tailwind blue-500
+      color: "white !important",
+      padding: "2px 0px",
+    },
+  });
 
   const customScrollbar = EditorView.theme({
-    ".cm-scroller": { 
+    ".cm-scroller": {
       scrollbarWidth: "thin", // For Firefox
     },
     "::-webkit-scrollbar": {
-      width: "8px",  // Scrollbar width
+      width: "8px", // Scrollbar width
       height: "8px", // Horizontal scrollbar height
     },
     "::-webkit-scrollbar-track": {
-      background: "#1E1E1E", // Track color
+      background: "#F3F4F6", // Track color
       borderRadius: "5px",
     },
     "::-webkit-scrollbar-thumb": {
-      background: "#007AFF", // Thumb color
+      background: "#F3F4F6", // Thumb color
       borderRadius: "5px",
     },
     "::-webkit-scrollbar-thumb:hover": {
-      background: "#005BBB", // Thumb hover effect
-    }
-  });
-  
-  const fullHeightEditor = EditorView.theme({
-    ".cm-scroller": { 
-      maxHeight: "14rem !important",  // Fixed height for scrolling
-      overflow: "auto !important", // Ensure scrollbars appear when needed
-    },
-    ".cm-content": { 
-      minHeight: "14rem !important",  // Prevents extra height
-      whiteSpace: "pre",  // Prevents text wrapping
-    },
-    ".cm-gutter": { 
-      minHeight: "14rem !important",  // Aligns with `.cm-content`
-      
+      background: "#F3F4F6", // Thumb hover effect
     },
   });
-  
 
   const getTables = () => {
     // console.log(db);
@@ -128,7 +148,7 @@ function sqlIDETwo() {
       .then((res) => {
         if (res.status === 200) {
           const unique_id = res.data;
-          if(unique_id != inq_id){
+          if (unique_id != inq_id) {
             window.localStorage.removeItem("unique_id");
             window.localStorage.setItem("unique_id", unique_id);
             setDb(unique_id);
@@ -196,133 +216,195 @@ function sqlIDETwo() {
     setEditorContent(fileContent);
   };
 
-  const handleClear = ()=>{
-    if(editorContent){
-      setEditorContent("")
+  const handleClear = () => {
+    if (editorContent) {
+      setEditorContent("");
       if (editorRef.current) {
         editorRef.current.focus();
       }
     }
-  }
+  };
+  const handleCopy = async () => {
+    if (editorContent.trim()) {
+      try {
+        await navigator.clipboard.writeText(editorContent);
+        setCopyDone(true);
+        console.log("Copied to clipboard");
+        setTimeout(() => {
+          setCopyDone(false);
+        }, 1000);
+      } catch (err) {
+        console.error("Failed to copy:", err);
+      }
+    }
+  };
+  const handlePaste = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text) {
+        setEditorContent((prev) => prev + text); // Appends to existing content
+        if (editorRef.current) {
+          editorRef.current.focus();
+          setPasteDone(true);
+          setTimeout(() => {
+            setPasteDone(false);
+          }, 1000);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to paste:", err);
+    }
+  };
+
+  const editorBtns = [
+    {
+      text: "Clear",
+      icon: <Eraser className="text-white" size={14} />,
+      action: handleClear,
+    },
+    {
+      text: "Execute",
+      icon: <CirclePlay className="text-white" size={14} />,
+      action: handleRun,
+    },
+  ];
+
+  useEffect(() => {
+    setTimeout(() => {
+      setShowInfo(true)
+    }, 1500);
+  },[])
 
   return (
-    <div className="flex h-screen w-screen bg-white text-black">
-    <div className="w-2/11 h-full flex items-center justify-center overflow-auto bg-black/10 px-2">
-      <TableDetail details={details} />
-    </div>
-  
-    <div className="flex flex-col items-end w-full h-full overflow-hidden">
-      {/* Top Controls */}
-      <div className="flex h-[8%] w-full px-3 items-center justify-between shadow-md bg-gray-100">
-        {/* Left Side Controls */}
-        <div className="flex items-center gap-x-3">
-          <button
-            className="cursor-pointer flex items-center gap-x-2 bg-red-500 px-3 py-2 rounded-lg hover:bg-red-600 text-white text-xs font-semibold tracking-wide transition"
-            onClick={handleClear}
-          >
-            <Eraser size="18" /> Clear
-          </button>
-          <button
-            className="cursor-pointer flex items-center gap-x-2 bg-green-600 px-3 py-2 rounded-lg hover:bg-ggreen-700 text-white text-xs font-semibold tracking-wide transition"
-            onClick={handleRun}
-          >
-            <Play size="18" /> Execute
+    <>
+      
+      {showInfo && <div className="bg-teal-500 w-1/3 h-auto px-4 py-3 absolute top-4 left-1/2 -translate-x-1/2 z-10 rounded-xl shadow-lg animate-pulse [animation-duration:3s]">
+        <div className="flex justify-between items-start">
+          <div className="flex gap-2 items-start">
+            <Info className="text-white mt-1" />
+            <p className="text-white text-sm font-medium">
+              Warning: Your user data, including databases, tables, and records
+              will be <span className="underline">permanently deleted</span>.
+            </p>
+          </div>
+          <button className="text-white hover:text-gray-300 transition" onClick={() => setShowInfo(false)}>
+            <X size={18} />
           </button>
         </div>
-  
-        {/* Right Side Controls */}
-        <div className="flex items-center gap-x-3">
-          <button
-            className="cursor-pointer flex items-center gap-x-2 bg-blue-700 px-3 py-2 rounded-lg hover:bg-blue-800 text-white text-xs font-semibold tracking-wide transition"
-            onClick={openFile}
-          >
-            <File size="18" /> Open Script
-          </button>
-          <button
-            className="cursor-pointer flex items-center gap-x-2 bg-blue-700 px-3 py-2 rounded-lg hover:bg-blue-800 text-white text-xs font-semibold tracking-wide transition"
-            onClick={handleDownload}
-          >
-            <Save size="18" /> Save Script
-          </button>
+      </div>}
+      <div className="flex flex-col h-screen w-screen overflow-hidden relative">
+        <div className="w-full h-[15%]  text-center p-2">
+          <div className=" h-full w-full "></div>
         </div>
-      </div>
-  
-      {/* Main Content */}
-      <div className="flex w-full h-[92%] overflow-hidden">
-        <div className="w-full h-full flex flex-col ">
-          {/* Code Editor Section */}
-            {/* <div className="h-1/3 w-full overflow-auto shadow-lg border border-gray-300 rounded-lg bg-gray-100 scrollbar-custom"> */}
-              <CodeMirror
-                value={editorContent}
-                className="w-full h-2/6 text-[1rem] scrollbar-custom border  border-gray-300 rounded-xl shadow-md overflow-hidden"
-                onChange={(newContent) => setEditorContent(newContent)}
-                theme="light"
-                // height="100%"
-                extensions={[fullHeightEditor, customScrollbar]}
-                options={{
-                  lineNumbers: true,
-                }}
-                onCreateEditor={(editor) => {
-                  editorRef.current = editor;
-                }}
+        <div className="flex flex-row items-center justify-center h-full w-full overflow-hidden">
+          <div className="h-full w-30 text-center p-2">
+            <div className=" h-full w-full "></div>
+          </div>
+          <div className="flex flex-col items-center justify-center h-full w-full gap-y-1">
+            <NavBar handleDownload={handleDownload} openFile={openFile} />
+            <div className="flex flex-row h-[90%] w-full overflow-hiddenpx-2 gap-x-2">
+              <LeftMenu
+                handleCopy={handleCopy}
+                handlePaste={handlePaste}
+                copyDone={copyDone}
+                pasteDone={pasteDone}
               />
-            {/* </div> */}
-  
-          {/* Records Count */}
-          {/* <div className="w-full h-[5%] px-4 flex items-center text-black">
-            {resDB.length > 0 && (
-              <div className="w-fit">
-                Total records: <strong>{resDB.length}</strong>
+              <div className="flex flex-row gap-x-2 h-full w-full ">
+                <TableDetail details={details} />
+                <div className="h-full w-6/7 flex flex-col gap-y-2">
+                  <div className="border-2 border-sky-700 w-full h-55 rounded-lg flex flex-col items-center justify-center p-1 gap-y-1">
+                    <div className="w-full h-12 flex items-center justify-between gap-x-2 rounded-lg bg-gray-200 px-1 py-5">
+                      <div className="flex items-center justify-center gap-x-1 px-2">
+                        <img src={sql} alt="python" className="w-8 h-8" />
+                        <p className="font-black">SQL</p>
+                      </div>
+                      <div className="flex items-center justify-center gap-x-2">
+                        {editorBtns.map((btn, index) => (
+                          <Button
+                            classNames={`cursor-pointer flex items-center justify-center gap-x-2 py-2.5 text-white font-semibold ${
+                              btn.text === "Execute"
+                                ? "bg-[#10B335]"
+                                : "bg-[#F7665D]"
+                            } px-4 ${
+                              btn.text === "Execute"
+                                ? "hover:bg-green-600"
+                                : "hover:bg-[#f7766d]"
+                            } rounded-lg`}
+                            action={btn.action}
+                            text={btn.text}
+                            icon={btn.icon}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <div className="h-full w-full flex items-start justify-center overflow-auto rounded-lg">
+                      <CodeMirror
+                        value={editorContent}
+                        className="w-full h-full text-[1rem] scrollbar-custom  overflow-hidden"
+                        theme="light"
+                        extensions={[
+                          fullHeightEditor,
+                          customScrollbar,
+                          highlightActiveLineGutter(),
+                        ]}
+                        onChange={(newContent) => setEditorContent(newContent)}
+                        options={{ lineNumbers: true }}
+                        onCreateEditor={(editor) => {
+                          editorRef.current = editor;
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="w-full h-70 border-sky-700 border-2 rounded-lg overflow-auto ">
+                    <Data res={resDB} />
+                  </div>
+                </div>
               </div>
-            )}
-          </div> */}
-  
-          {/* Data Output Section */}
-          <div className="w-full h-4/6 overflow-auto p-3">
-            <div className="w-full h-full overflow-auto rounded-lg bg-gray-100 scrollbar-custom-sql" ref={dataRef}>
-              {resDB.length > 0 && <Data res={resDB} />}
             </div>
           </div>
+          <div className="h-full w-30 text-center p-2">
+            <div className=" h-full w-full "></div>{" "}
+          </div>
+        </div>
+        <div className="w-full h-[15%] text-center p-2">
+          <div className=" h-full w-full"></div>{" "}
         </div>
       </div>
-    </div>
-  
-    <Toaster
-      position="top-center"
-      reverseOrder={false}
-      gutter={8}
-      containerClassName=""
-      containerStyle={{}}
-      toastOptions={{
-        className: "",
-        duration: 5000,
-        removeDelay: 1000,
-        style: {
-          background: "green",
-          color: "#fff",
-        },
-        success: {
-          duration: 3000,
-          iconTheme: {
-            primary: "white",
-            secondary: "black",
-          },
-        },
-        error: {
-          duration: 3000,
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        gutter={8}
+        containerClassName=""
+        containerStyle={{}}
+        toastOptions={{
+          className: "",
+          duration: 5000,
+          removeDelay: 1000,
           style: {
-            backgroundColor: "red",
-            color: "white",
+            background: "green",
+            color: "#fff",
           },
-          iconTheme: {
-            primary: "white",
-            secondary: "red",
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: "white",
+              secondary: "black",
+            },
           },
-        },
-      }}
-    />
-  </div>
-  
+          error: {
+            duration: 3000,
+            style: {
+              backgroundColor: "red",
+              color: "white",
+            },
+            iconTheme: {
+              primary: "white",
+              secondary: "red",
+            },
+          },
+        }}
+      />
+    </>
   );
 }
 

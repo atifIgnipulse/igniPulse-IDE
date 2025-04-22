@@ -55,3 +55,16 @@
 .scrollbar-thin::-webkit-scrollbar-track {
   background-color: #f0f0f0; /* Light background color for track */
 }
+
+.scrollbar-hide {
+  /* Firefox */
+  scrollbar-width: none;
+
+  /* IE and Edge */
+  -ms-overflow-style: none;
+}
+
+/* Chrome, Safari, and Opera */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

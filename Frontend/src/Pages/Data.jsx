@@ -5,15 +5,15 @@ const Data = ({ res }) => {
   return (
     <>
       {res.length > 0 ? (
-        <div className="table-container bg-gray-50  rounded-lg shadow-md">
-          <table className="w-full border-collapse">
+        <div className="table-container bg-gray-50 rounded-lg shadow-md">
+          <table className="w-full border-none">
             {/* Table Header */}
-            <thead className="sticky top-0 bg-[#192150] text-white z-10">
+            <thead className="sticky top-0 bg-[#194cd8] text-white z-10">
               <tr>
                 {Object.keys(res[0]).map((key) => (
                   <th
                     key={key}
-                    className="px-3 py-3 text-sm border-e-2 border-[#818080] text-white tracking-wider text-left uppercase"
+                    className="px-3 py-3 text-sm border-none text-white tracking-wider text-left uppercase"
                   >
                     {key}
                   </th>
@@ -33,7 +33,7 @@ const Data = ({ res }) => {
                   {Object.keys(row).map((key) => (
                     <td
                       key={key}
-                      className="border-2 border-gray-300 px-4 py-2 text-start text-sm text-gray-800"
+                      className="border-2 border-none px-4 py-2 text-start text-sm text-gray-800"
                     >
                       {row[key]}
                     </td>

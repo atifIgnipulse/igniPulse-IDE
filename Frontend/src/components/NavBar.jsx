@@ -16,7 +16,7 @@ function NavBar({ openFile, handleDownload }) {
     },
   ];
   return (
-    <div className="w-full h-16 rounded-xl bg-gray-100 border-2 border-sky-700 overflow-hidden flex flex-row items-center justify-between px-2">
+    <div className="w-full h-[10%] rounded-xl bg-gray-100 border-2 border-sky-700 overflow-hidden flex flex-row items-center justify-between px-2">
       <div className="w-1/2 h-full flex items-center justify-start px-5 gap-x-2">
         <Rocket className="text-blue-600" size={22} />{" "}
         <p className="text-lg font-black">igniUp</p>
