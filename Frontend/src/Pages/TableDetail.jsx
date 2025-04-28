@@ -14,19 +14,19 @@ function TableDetail({ details }) {
   };
 
   return (
-    <div className="w-1/7 h-full border-2 border-sky-700 p-1 rounded-lg">
+    <div className="w-50 h-[100%] border-2 border-sky-700 p-1 rounded-lg overflow-hidden">
       {/* Header */}
       <p className="text-[#1E293B] rounded-lg py-3 text-md font-bold text-center w-full bg-[#E5E7EB] mb-1">
         Available Tables
       </p>
 
       {/* Table List */}
-      <div className="overflow-auto h-full scrollbar-hide py-1">
+      <div className="overflow-auto h-[90%] scrollbar-hide py-1">
         {details.map((detail, index) => (
           <div key={index} className="flex flex-col items-end w-full mb-1">
             {/* Table Name */}
             <div
-              className="w-full flex items-center gap-x-2 cursor-pointer select-none py-2 px-3 rounded-xl bg-[#0044ff39] hover:bg-[#0044ff51] transition duration-200"
+              className="w-full flex items-center gap-x-2 cursor-pointer select-none py-2 px-3 rounded-md bg-[#0044ff39] hover:bg-[#0044ff51] transition duration-200"
               onClick={() => toggleVisibility(index)}
             >
               {visibleRows[index] ? (

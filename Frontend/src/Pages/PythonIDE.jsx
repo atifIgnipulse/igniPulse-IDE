@@ -13,9 +13,17 @@ import {
   Save,
 } from "lucide-react";
 import { io } from "socket.io-client";
+
 import CodeMirror from "@uiw/react-codemirror";
-import { EditorView, highlightActiveLineGutter } from "@codemirror/view";
 import { python } from "@codemirror/lang-python";
+import {
+  EditorView,
+  highlightActiveLineGutter,
+  lineNumbers,
+  keymap,
+} from "@codemirror/view";
+import { defaultKeymap } from "@codemirror/commands";
+import { indentOnInput } from "@codemirror/language";
 
 import py from "../assets/py.svg";
 import LeftMenu from "../components/LeftMenu";
@@ -108,25 +116,41 @@ function PythonIDE() {
         inputPromptDiv.id = "inputPromptDiv";
         inputPromptDiv.style.marginTop = "0px";
         inputPromptDiv.style.display = "flex";
-        inputPromptDiv.style.alignItems = "center";
+        inputPromptDiv.style.alignItems = "start";
         inputPromptDiv.style.justifyContent = "start";
 
         // Create a label for the last line
         const promptLabel = document.createElement("label");
         promptLabel.innerHTML = lines[lines.length - 1].replace(/\n/g, "<br>");
         promptLabel.style.marginRight = "10px";
+        promptLabel.style.paddingTop = "3px";
         promptLabel.style.color = "black";
 
-        // Create the input box
-        const inputBox = document.createElement("input");
-        inputBox.type = "text";
+        const inputBox = document.createElement("textarea");
         inputBox.id = "dynamicInput";
-        inputBox.style.padding = "0px";
+        inputBox.style.padding = "4px";
         inputBox.style.outline = "none";
         inputBox.style.backgroundColor = "inherit";
         inputBox.style.color = "black";
+        inputBox.style.resize = "none";
+        inputBox.style.overflow = "hidden";
+        inputBox.rows = 1;
+        inputBox.style.boxSizing = "border-box";
+        inputBox.style.display = "inline-block";
+        inputBox.style.minWidth = "50px";
+        inputBox.style.maxWidth = "450px";
 
-        // Append label and input box to inputPromptDiv
+        // Auto height and width
+        inputBox.addEventListener("input", () => {
+          inputBox.style.height = "auto";
+          inputBox.style.height = inputBox.scrollHeight + "px";
+
+          // Set width based on characters but limited by parent width
+          const length = inputBox.value.length || 1;
+          inputBox.style.width = `${length + 1}ch`;
+        });
+
+        // Append label and input box
         inputPromptDiv.appendChild(promptLabel);
         inputPromptDiv.appendChild(inputBox);
 
@@ -198,38 +222,56 @@ function PythonIDE() {
     }
   };
   const handleCopy = async () => {
-    if (editorContent.trim()) {
+    if (editorRef.current) {
       try {
-        await navigator.clipboard.writeText(editorContent);
-        setCopyDone(true);
-        console.log("Copied to clipboard");
-        setTimeout(() => {
+        const editorContent = editorRef.current.state.doc.toString(); // Get the editor content
+        if (editorContent.trim()) {
+          await navigator.clipboard.writeText(editorContent); // Copy the content to clipboard
+          setCopyDone(true);
+          console.log("Copied to clipboard");
+          setTimeout(() => {
             setCopyDone(false);
-        }, 1000);
+          }, 1000);
+        }
       } catch (err) {
-        
         console.error("Failed to copy:", err);
-        
       }
     }
   };
+  
   const handlePaste = async () => {
     try {
-      const text = await navigator.clipboard.readText();
-      if (text) {
-        setEditorContent((prev) => prev + text); // Appends to existing content
-        if (editorRef.current) {
-          editorRef.current.focus();
-          setPasteDone(true);
-          setTimeout(() => {
-            setPasteDone(false);
-          }, 1000);
-        }
+      const text = await navigator.clipboard.readText(); 
+      if (text && editorRef.current) {
+        const contentLength = editorRef.current.state.doc.length;
+        
+      
+        editorRef.current.dispatch({
+          changes: {
+            from: contentLength, 
+            to: contentLength, 
+            insert: text, 
+          },
+        });
+  
+        editorRef.current.focus();
+        
+        editorRef.current.dispatch({
+          selection: { anchor: contentLength, head: contentLength },
+        });
+  
+        setEditorContent(editorRef.current.state.doc.toString()); 
+        setPasteDone(true);
+        setTimeout(() => {
+          setPasteDone(false);
+        }, 1000);
       }
     } catch (err) {
       console.error("Failed to paste:", err);
     }
   };
+  
+  
 
   const openFile = async () => {
     const [fileHandle] = await window.showOpenFilePicker({
@@ -251,10 +293,14 @@ function PythonIDE() {
     if (editorContent) {
       setEditorContent("");
       if (editorRef.current) {
+        editorRef.current.dispatch({
+          changes: { from: 0, to: editorRef.current.state.doc.length, insert: "" },
+        });
         editorRef.current.focus();
       }
     }
   };
+  
   const fullHeightEditor = EditorView.theme({
     ".cm-scroller": {
       maxHeight: "440px !important",
@@ -319,7 +365,7 @@ function PythonIDE() {
 
   return (
     <>
-      <div className="flex flex-col h-screen w-screen overflow-hidden relative">
+      <div className="flex flex-col h-screen w-screen overflow-hidden relative ">
         <div className="w-full h-22 text-center p-2">
           <div className=" h-full w-full"></div>
         </div>
@@ -330,7 +376,12 @@ function PythonIDE() {
           <div className="w-full h-full gap-y-2 flex flex-col justify-between">
             <NavBar handleDownload={handleDownload} openFile={openFile} />
             <div className="bg-gray-100 h-full w-full flex items-center justify-center gap-x-2 p-2 rounded-xl">
-              <LeftMenu handleCopy={handleCopy} handlePaste={handlePaste} copyDone={copyDone} pasteDone={pasteDone}/>
+              <LeftMenu
+                handleCopy={handleCopy}
+                handlePaste={handlePaste}
+                copyDone={copyDone}
+                pasteDone={pasteDone}
+              />
               <div className="border-2 border-sky-700 w-[55%] h-full rounded-lg flex flex-col items-center justify-center p-2 gap-y-1">
                 <div className="w-full h-12 flex items-center justify-between gap-x-2 rounded-lg bg-gray-200 px-2">
                   <div className="flex items-center justify-center gap-x-1 px-2">
@@ -356,18 +407,21 @@ function PythonIDE() {
                     ))}
                   </div>
                 </div>
-                <div className="h-[450px] w-full flex items-start justify-center overflow-auto rounded-lg">
+                <div className="h-[475px] w-full flex items-start justify-center overflow-auto rounded-lg">
                   <CodeMirror
-                    value={editorContent}
-                    className="w-[650px] text-[1rem] scrollbar-custom  overflow-hidden"
+                    defaultValue={editorContent}
+                    className="w-[650px] text-[1rem] scrollbar-custom overflow-hidden"
                     theme="light"
                     extensions={[
                       fullHeightEditor,
-                      customScrollbar,
                       highlightActiveLineGutter(),
+                      lineNumbers(),
+                      keymap.of(defaultKeymap),
+                      indentOnInput(),
                     ]}
-                    onChange={(newContent) => setEditorContent(newContent)}
-                    options={{ lineNumbers: true }}
+                    onChange={(newContent) => {
+                      setEditorContent(newContent); 
+                    }}
                     onCreateEditor={(editor) => {
                       editorRef.current = editor;
                     }}
@@ -394,11 +448,11 @@ function PythonIDE() {
             </div>
           </div>
           <div className="h-full w-30 text-center p-2">
-            <div className=" h-full w-full"></div>{" "}
+            <div className=" h-full w-full"></div>
           </div>
         </div>
-        <div className="w-full h-22 text-center p-2">
-          <div className=" h-full w-full"></div>{" "}
+        <div className="w-full h-10 text-center p-2">
+          <div className=" h-full w-full"></div>
         </div>
       </div>
     </>

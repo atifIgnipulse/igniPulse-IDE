@@ -11,7 +11,7 @@ import TableDetail from "./TableDetail";
 import LeftMenu from "../components/LeftMenu";
 import NavBar from "../components/NavBar";
 import Button from "../components/Button";
-import {Info, X} from "lucide-react";
+import { Info, X } from "lucide-react";
 
 function sqlIDETwo() {
   const dataRef = useRef(null);
@@ -29,15 +29,17 @@ function sqlIDETwo() {
 
   const fullHeightEditor = EditorView.theme({
     ".cm-scroller": {
-      maxHeight: "200px !important",
+      maxHeight: "130px !important",
+      width: "940px !important",
       overflow: "auto !important",
     },
     ".cm-content": {
-      minHeight: "200px !important",
+      minHeight: "130px !important",
+      minWidth: "800px !important" ,
       whiteSpace: "pre",
     },
     ".cm-gutter": {
-      minHeight: "200px !important",
+      minHeight: "130px !important",
     },
     ".cm-gutters": {
       backgroundColor: "#F1F5F9", // Light background
@@ -114,9 +116,9 @@ function sqlIDETwo() {
   // };
 
   const handleRun = () => {
-    // console.log("first");
-    if (editorContent != "") {
-      Config.postData(editorContent, db)
+    const currentContent = editorRef.current?.state.doc.toString();
+    if (currentContent !== "") {
+      Config.postData(currentContent, db)
         .then((res) => {
           if (res.data.success) {
             toast.success("success");
@@ -220,41 +222,67 @@ function sqlIDETwo() {
     if (editorContent) {
       setEditorContent("");
       if (editorRef.current) {
+        editorRef.current.dispatch({
+          changes: {
+            from: 0,
+            to: editorRef.current.state.doc.length,
+            insert: "",
+          },
+        });
         editorRef.current.focus();
       }
     }
   };
+
   const handleCopy = async () => {
-    if (editorContent.trim()) {
-      try {
-        await navigator.clipboard.writeText(editorContent);
-        setCopyDone(true);
-        console.log("Copied to clipboard");
-        setTimeout(() => {
-          setCopyDone(false);
-        }, 1000);
-      } catch (err) {
-        console.error("Failed to copy:", err);
+    try {
+      if (editorRef.current) {
+        // Get the editor's content using `state.doc.toString()`
+        const editorContent = editorRef.current.state.doc.toString();
+        if (editorContent.trim()) {
+          await navigator.clipboard.writeText(editorContent);
+          setCopyDone(true);
+          console.log("Copied to clipboard");
+          setTimeout(() => {
+            setCopyDone(false);
+          }, 1000);
+        }
+      } else {
+        console.error("Editor is not initialized properly.");
       }
+    } catch (err) {
+      console.error("Failed to copy:", err);
     }
   };
+  
   const handlePaste = async () => {
     try {
       const text = await navigator.clipboard.readText();
-      if (text) {
-        setEditorContent((prev) => prev + text); // Appends to existing content
-        if (editorRef.current) {
-          editorRef.current.focus();
-          setPasteDone(true);
-          setTimeout(() => {
-            setPasteDone(false);
-          }, 1000);
-        }
+      if (text && editorRef.current) {
+        // Get the current cursor position
+        const cursorPosition = editorRef.current.state.selection.main.head;
+        // Dispatch changes to insert the pasted text at the current cursor position
+        editorRef.current.dispatch({
+          changes: {
+            from: cursorPosition,
+            to: cursorPosition,
+            insert: text,
+          },
+        });
+        setEditorContent(editorRef.current.state.doc.toString()); // Update state with new content
+        editorRef.current.focus();
+        setPasteDone(true);
+        setTimeout(() => {
+          setPasteDone(false);
+        }, 1000);
       }
     } catch (err) {
       console.error("Failed to paste:", err);
     }
   };
+  
+  
+  
 
   const editorBtns = [
     {
@@ -271,38 +299,44 @@ function sqlIDETwo() {
 
   useEffect(() => {
     setTimeout(() => {
-      setShowInfo(true)
+      setShowInfo(true);
     }, 1500);
-  },[])
+  }, []);
 
   return (
     <>
-      
-      {showInfo && <div className="bg-teal-500 w-1/3 h-auto px-4 py-3 absolute top-4 left-1/2 -translate-x-1/2 z-10 rounded-xl shadow-lg animate-pulse [animation-duration:3s]">
-        <div className="flex justify-between items-start">
-          <div className="flex gap-2 items-start">
-            <Info className="text-white mt-1" />
-            <p className="text-white text-sm font-medium">
-              Warning: Your user data, including databases, tables, and records
-              will be <span className="underline">permanently deleted</span>.
-            </p>
+      {showInfo && (
+        <div className="bg-teal-500 w-1/3 h-auto px-4 py-3 absolute top-4 left-1/2 -translate-x-1/2 z-10 rounded-xl shadow-lg animate-pulse [animation-duration:3s]">
+          <div className="flex justify-between items-start">
+            <div className="flex gap-2 items-start">
+              <Info className="text-white mt-1" />
+              <p className="text-white text-sm font-medium">
+                Warning: Your user data, including databases, tables, and
+                records will be{" "}
+                <span className="underline">permanently deleted</span> after
+                7days.
+              </p>
+            </div>
+            <button
+              className="text-white hover:text-gray-300 transition"
+              onClick={() => setShowInfo(false)}
+            >
+              <X size={18} />
+            </button>
           </div>
-          <button className="text-white hover:text-gray-300 transition" onClick={() => setShowInfo(false)}>
-            <X size={18} />
-          </button>
         </div>
-      </div>}
-      <div className="flex flex-col h-screen w-screen overflow-hidden relative">
+      )}
+      <div className="flex flex-col h-screen w-screen overflow-hidden relative bg-white/40">
         <div className="w-full h-[15%]  text-center p-2">
           <div className=" h-full w-full "></div>
         </div>
         <div className="flex flex-row items-center justify-center h-full w-full overflow-hidden">
-          <div className="h-full w-30 text-center p-2">
+          <div className="h-full w-50 text-center p-2">
             <div className=" h-full w-full "></div>
           </div>
           <div className="flex flex-col items-center justify-center h-full w-full gap-y-1">
             <NavBar handleDownload={handleDownload} openFile={openFile} />
-            <div className="flex flex-row h-[90%] w-full overflow-hiddenpx-2 gap-x-2">
+            <div className="flex flex-row h-[85%] w-full overflow-hiddenpx-2 gap-x-2 bg-gray-50 p-2 rounded-lg">
               <LeftMenu
                 handleCopy={handleCopy}
                 handlePaste={handlePaste}
@@ -337,36 +371,38 @@ function sqlIDETwo() {
                         ))}
                       </div>
                     </div>
-                    <div className="h-full w-full flex items-start justify-center overflow-auto rounded-lg">
+                    <div className="w-full h-full flex items-start justify-center overflow-auto rounded-lg">
                       <CodeMirror
-                        value={editorContent}
-                        className="w-full h-full text-[1rem] scrollbar-custom  overflow-hidden"
+                        defaultValue={editorContent}
+                        className="text-[1rem] scrollbar-custom rounded-lg"
                         theme="light"
                         extensions={[
                           fullHeightEditor,
                           customScrollbar,
                           highlightActiveLineGutter(),
                         ]}
-                        onChange={(newContent) => setEditorContent(newContent)}
-                        options={{ lineNumbers: true }}
+                        onChange={(newContent, viewUpdate) => {
+                          setEditorContent(newContent);
+                          editorRef.current = viewUpdate.view;
+                        }}
                         onCreateEditor={(editor) => {
                           editorRef.current = editor;
                         }}
                       />
                     </div>
                   </div>
-                  <div className="w-full h-70 border-sky-700 border-2 rounded-lg overflow-auto ">
+                  <div className="w-full h-full border-sky-700 border-2 rounded-lg overflow-auto ">
                     <Data res={resDB} />
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <div className="h-full w-30 text-center p-2">
+          <div className="h-full w-50 text-center p-2">
             <div className=" h-full w-full "></div>{" "}
           </div>
         </div>
-        <div className="w-full h-[15%] text-center p-2">
+        <div className="w-full h-10 text-center p-2">
           <div className=" h-full w-full"></div>{" "}
         </div>
       </div>

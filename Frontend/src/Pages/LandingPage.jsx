@@ -1,113 +1,173 @@
-import React from "react";
+import { React, useRef } from "react";
 import { NavLink } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Rocket, Code, Lightbulb } from "lucide-react";
+import { Rocket, Lightbulb } from "lucide-react";
 import py from "../assets/py.svg";
 import sql from "../assets/sql.svg";
-// import dataScienceLogo from '../assets/data-science.svg'
+import pyVid from "../assets/python.webp";
+// import rocket_with_tail from "../assets/rocket-tail.png";
+// import rocket from "/rocket.fbx";
+
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
+import { FBXLoader } from "three-stdlib";
+import { useLoader } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
+
+function Model() {
+  const fbx = useLoader(FBXLoader, "/rocket.fbx");
+  const ref = useRef();
+
+  useFrame(() => {
+    if (ref.current) {
+      ref.current.rotation.y += 0.005;
+      ref.current.rotation.x = Math.PI / -6;
+    }
+  });
+
+  return (
+    <group ref={ref} scale={0.015} position={[0, 0, 0]}>
+      <primitive object={fbx} />
+    </group>
+  );
+}
 
 const LandingPage = () => {
-  const texts = [
+  const cards = [
     {
       name: "Python",
-      desc: "A clean and user-friendly Python IDE, great for beginners to write, test, and understand Python code with ease. Ideal for learning and quick experiments.",
-      btnText: "Play",
+      desc: "An easy-to-use Python setup for beginners. Write and run your code, build projects, and learn programming basics step by step.",
       link: "/python",
-      color: "text-green-400",
-      bgColor: "bg-green-500",
-      hoverBg: "hover:bg-green-600",
-      shadowColor: "hover:shadow-green-500/50",
       logo: py,
     },
-    // {
-    //   name: "Python for Data Science",
-    //   desc: "A simplified environment for data science learners. A great starting point to explore pandas, NumPy, and Matplotlib with ease.",
-    //   btnText: "Play",
-    //   link: "/python-ds",
-    //   color: "text-yellow-400",
-    //   bgColor: "bg-yellow-500",
-    //   hoverBg: "hover:bg-yellow-600",
-    //   shadowColor: "hover:shadow-yellow-500/50",
-    //   logo: py,
-    // },
     {
       name: "SQL",
-      desc: "An intuitive SQL IDE designed for beginners and intermediate users. Easily write queries, explore tables, and visualize your database structure.",
-      btnText: "Play",
+      desc: "A simple tool to learn how to work with databases. Practice writing queries, explore tables, and understand how data is stored and managed.",
       link: "/sql",
-      color: "text-blue-400",
-      bgColor: "bg-blue-500",
-      hoverBg: "hover:bg-blue-600",
-      shadowColor: "hover:shadow-blue-500/50",
       logo: sql,
     },
   ];
 
   return (
-    <div className="relative bg-white text-black min-h-screen flex flex-col items-center justify-center gap-y-6 p-4 font-urbanist">
-      {/* Website Name */}
-      <motion.h1
-        className="text-6xl font-extrabold text-black tracking-wide drop-shadow-md flex items-center gap-2"
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1 }}
-      >
-        <Rocket size={50} className="text-blue-700" /> igniUp
-      </motion.h1>
-
-      {/* Motivational Quote */}
-      <motion.h2
-        className="text-lg italic text-center max-w-xl tracking-wide text-gray-700 bg-black/10 px-6 py-4 rounded-xl shadow-md flex items-center gap-2"
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1, delay: 0.5 }}
-      >
-        <Lightbulb className="w-6 h-6 text-yellow-500" /> “Empowering the next
-        generation of innovators through technology and hands-on learning.”
-      </motion.h2>
-
-      {/* IDE Cards Section */}
-      <div className="grid md:grid-cols-2 gap-6 w-full max-w-3xl relative mt-3">
-        {texts.map((ide, index) => (
-          <motion.div
-            key={index}
-            className="bg-gray-100 h-[15rem] px-6 py-2 rounded-2xl shadow-lg flex flex-col items-end transition-transform transform hover:scale-[1.009] border border-blue-700/50 cursor-pointer hover:shadow-xl"
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 1 + index * 0.2 }}
-          >
-            <div className="w-full grid place-items-center">
-              {ide.name === "Python" ? (
-                <img src={py} alt="py" />
-              ) : ide.name === "SQL" ? (
-                <img src={sql} alt="sql" />
-              ) : ide.name === "Python for Data Science" ? (
-                <img src={py} alt="py" />
-              ) : null}
-            </div>
-            <h3 className="w-full text-center text-2xl font-bold text-blue-700">
-              {ide.name}
-            </h3>
-            <p className="w-full text-gray-700 text-center mt-3 text-base leading-relaxed min-h-[4.5rem]">
-              {ide.desc}
-            </p>
-            <div className="mt-auto py-4">
-              <NavLink
-                to={ide.link}
-                className="bg-blue-500 text-white px-10 py-2 rounded-br-2xl"
-              >
-                {ide.btnText}
-              </NavLink>
-            </div>
-          </motion.div>
-        ))}
+    <>
+      <div className="w-1/5 h-1/2 absolute top-0 right-90 z-10 pointer-events-none">
+        {/* The canvas is positioned on the left initially and will be moved to the top-right */}
+        <Canvas
+          className=" absolute inset-0 z-0"
+          camera={{ position: [5, -2, 1] }}
+        >
+          <ambientLight intensity={1} />
+          <directionalLight position={[0, 0, 3]} intensity={2} />
+          <Model />
+          <OrbitControls
+            enableZoom={false}
+            enablePan={false}
+            maxPolarAngle={Math.PI / 2} // Limit vertical rotation to 90 degrees (X-axis)
+            minPolarAngle={Math.PI / 2} // Optionally restrict to tilt range
+          />
+        </Canvas>
       </div>
+      <div className="w-full h-screen grid place-items-center ">
+        <div className="w-[70%] h-[90%]py-14">
+          <div className="h-10 w-full flex  items-center justify-between px-2">
+            <div className="text-4xl flex items-center font-black tracking-tighter">
+              <Rocket className="text-blue-700" size={60} />
+              igniUp
+            </div>
+            <button className="flex items-center justify-center gap-x-2 bg-[#3960CC] text-white px-4 py-2 rounded-md text-sm tracking-wide">
+              About Us{" "}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="#3960CC"
+                stroke="#ffffff"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="rounded-sm bg-white"
+              >
+                <path d="M6 9h6V5l7 7-7 7v-4H6V9z" />
+              </svg>
+            </button>
+          </div>
+          <div className="flex items-center justify-between h-40 w-full px-2 ">
+            <div className="flex flex-col items-start justify-center h-full w-1/2">
+              <div className="font-black text-3xl">Empowering the</div>
+              <div className="font-black text-5xl text-[#284cac]">
+                Next Generation
+              </div>
+              <div className="text-md font-extrabold">
+                of Innovations through Technology and Hands-on Learning.
+              </div>
+            </div>
+          </div>
+          <div className="h-100 w-full">
+            <div className="flex items-center justify-between w-full h-full px-2 gap-x-4">
+              {cards.map((card, idx) => (
+                <div
+                  key={idx}
+                  className="bg-gray-200 w-1/2 h-full rounded-sm px-2 py-2 flex flex-col justify-between items-center shadow-lg gap-y-1"
+                  // initial={{ opacity: 0, y: 50 }}
+                  // animate={{ opacity: 1, y: 0 }}
+                  // transition={{ duration: 0.8, delay: idx * 0.3 }}
+                >
+                  <div className="w-full h-60 rounded-md mx-auto bg-gray-300/60 overflow-hidden">
+                    {card.name.toLowerCase() === "python" ? (
+                      <img
+                      src={pyVid}
+                      alt="Description"
+                      style={{
+                        width: "100%",      
+                        height: "100%",     
+                        objectFit: "center", 
+                      }}
+                    />
+                    
 
-      {/* Footer */}
-      {/* <footer className="text-gray-700 text-xs text-center border-t border-gray-300 w-full py-3 mt-8">
-        © 2025 Ignipulse. Empowering IT education and innovation, one line of code at a time.
-      </footer> */}
-    </div>
+                      // <video
+                      //   src={pyVid}
+                      //   autoPlay
+                      //   muted
+                      //   playsInline
+                      //   loop
+                      //   onError={(e) => console.error("Video failed to load or play:", e)}
+                      //   style={{
+                      //     width: "100%",
+                      //     height: "100%",
+                      //     objectFit: "contain",
+                      //   }}
+                      // />
+                    ) : (
+                      <div style={{ width: "100%", height: "100%" }}>
+                        {/* Placeholder content when it's not 'python' */}
+                        <p>No video available</p>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-start gap-x-2 w-full px-1">
+                    <img
+                      src={card.logo}
+                      alt={`${card.name} logo`}
+                      className=" size-10"
+                    />
+                    <h2 className="text-xl font-bold">{card.name}</h2>
+                  </div>
+                  <p className="px-3">{card.desc}</p>
+                  <NavLink
+                    to={card.link}
+                    className="bg-blue-600 text-white text-center w-full py-1 rounded-md  hover:bg-blue-700 transition"
+                  >
+                    <p className="leading-8">Get Started</p>
+                  </NavLink>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
 

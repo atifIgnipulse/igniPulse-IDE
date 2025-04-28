@@ -6,6 +6,7 @@ import removeConsole from 'vite-plugin-remove-console'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss(), removeConsole()],
+  assetsInclude: ['**/*.fbx', "**/*.avi"],
   // server:{
   //   port: 9000
   // },
