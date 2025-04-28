@@ -16,8 +16,8 @@ function TableDetail({ details }) {
   return (
     <div className="w-50 h-[100%] border-2 border-sky-700 p-1 rounded-lg overflow-hidden">
       {/* Header */}
-      <p className="text-[#1E293B] rounded-lg py-3 text-md font-bold text-center w-full bg-[#E5E7EB] mb-1">
-        Available Tables
+      <p className="text-[#1E293B] rounded-lg py-3 text-md font-bold text-start px-4 w-full bg-[#E5E7EB] mb-1">
+        Tables
       </p>
 
       {/* Table List */}

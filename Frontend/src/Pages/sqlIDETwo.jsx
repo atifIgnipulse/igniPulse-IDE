@@ -30,12 +30,11 @@ function sqlIDETwo() {
   const fullHeightEditor = EditorView.theme({
     ".cm-scroller": {
       maxHeight: "130px !important",
-      width: "940px !important",
+      width: "1020px !important",
       overflow: "auto !important",
     },
     ".cm-content": {
       minHeight: "130px !important",
-      minWidth: "800px !important" ,
       whiteSpace: "pre",
     },
     ".cm-gutter": {
@@ -306,7 +305,7 @@ function sqlIDETwo() {
   return (
     <>
       {showInfo && (
-        <div className="bg-teal-500 w-1/3 h-auto px-4 py-3 absolute top-4 left-1/2 -translate-x-1/2 z-10 rounded-xl shadow-lg animate-pulse [animation-duration:3s]">
+        <div className="bg-red-500 w-1/3 h-auto px-4 py-3 absolute top-4 left-1/2 -translate-x-1/2 z-10 rounded-xl shadow-lg animate-pulse [animation-duration:3s]">
           <div className="flex justify-between items-start">
             <div className="flex gap-2 items-start">
               <Info className="text-white mt-1" />
@@ -331,7 +330,7 @@ function sqlIDETwo() {
           <div className=" h-full w-full "></div>
         </div>
         <div className="flex flex-row items-center justify-center h-full w-full overflow-hidden">
-          <div className="h-full w-50 text-center p-2">
+          <div className="h-full w-30 text-center p-2">
             <div className=" h-full w-full "></div>
           </div>
           <div className="flex flex-col items-center justify-center h-full w-full gap-y-1">
@@ -345,7 +344,7 @@ function sqlIDETwo() {
               />
               <div className="flex flex-row gap-x-2 h-full w-full ">
                 <TableDetail details={details} />
-                <div className="h-full w-6/7 flex flex-col gap-y-2">
+                <div className="h-full w-full flex flex-col gap-y-2">
                   <div className="border-2 border-sky-700 w-full h-55 rounded-lg flex flex-col items-center justify-center p-1 gap-y-1">
                     <div className="w-full h-12 flex items-center justify-between gap-x-2 rounded-lg bg-gray-200 px-1 py-5">
                       <div className="flex items-center justify-center gap-x-1 px-2">
@@ -355,7 +354,7 @@ function sqlIDETwo() {
                       <div className="flex items-center justify-center gap-x-2">
                         {editorBtns.map((btn, index) => (
                           <Button
-                            classNames={`cursor-pointer flex items-center justify-center gap-x-2 py-2.5 text-white font-semibold ${
+                            classNames={` cursor-pointer flex items-center justify-center gap-x-2 py-2.5 text-white font-semibold ${
                               btn.text === "Execute"
                                 ? "bg-[#10B335]"
                                 : "bg-[#F7665D]"
@@ -398,7 +397,7 @@ function sqlIDETwo() {
               </div>
             </div>
           </div>
-          <div className="h-full w-50 text-center p-2">
+          <div className="h-full w-30 text-center p-2">
             <div className=" h-full w-full "></div>{" "}
           </div>
         </div>

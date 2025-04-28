@@ -24,7 +24,7 @@ function NavBar({ openFile, handleDownload }) {
       <div className="w-1/2 h-full flex items-center justify-end gap-x-2">
         {navBtnText?.map((btn, index) => (
 
-          <Button classNames="cursor-pointer flex items-center justify-center gap-x-2 py-2 text-white font-semibold bg-[#2E60EB] px-4 hover:bg-[#1f4bc6e0] rounded-lg"
+          <Button classNames=" cursor-pointer flex items-center justify-center gap-x-2 py-2 text-white font-semibold bg-[#2E60EB] px-4 hover:bg-[#1f4bc6e0] rounded-lg"
           action={btn.action} text={btn.text} icon={btn.icon} /> 
         ))}
       </div>

@@ -20,13 +20,13 @@ function Model() {
 
   useFrame(() => {
     if (ref.current) {
-      ref.current.rotation.y += 0.005;
+      ref.current.rotation.y += 0.06;
       ref.current.rotation.x = Math.PI / -6;
     }
   });
 
   return (
-    <group ref={ref} scale={0.015} position={[0, 0, 0]}>
+    <group ref={ref} scale={0.012} position={[0, 0, 0]}>
       <primitive object={fbx} />
     </group>
   );
@@ -98,7 +98,7 @@ const LandingPage = () => {
               <div className="font-black text-5xl text-[#284cac]">
                 Next Generation
               </div>
-              <div className="text-md font-extrabold">
+              <div className="text-lg font-extrabold">
                 of Innovations through Technology and Hands-on Learning.
               </div>
             </div>
@@ -152,7 +152,7 @@ const LandingPage = () => {
                       alt={`${card.name} logo`}
                       className=" size-10"
                     />
-                    <h2 className="text-xl font-bold">{card.name}</h2>
+                    <h2 className="text-2xl font-bold">{card.name}</h2>
                   </div>
                   <p className="px-3">{card.desc}</p>
                   <NavLink
